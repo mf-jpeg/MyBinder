@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -44,6 +45,7 @@ android {
 }
 
 dependencies {
+    // Default
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,4 +55,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
+
+    // Custom
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.navigation.compose)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.views)
+    implementation(libs.kotlin.serialization)
 }

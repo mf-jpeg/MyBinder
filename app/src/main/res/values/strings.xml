@@ -2,4 +2,10 @@
 
 <resources>
     <string name="app_name">My Binder</string>
+
+    <!-- Top Bar -->
+    <string name="top_bar_deck">Deck</string>
+    <string name="top_bar_binder">Binder</string>
+    <string name="top_bar_search">Card Search</string>
+    <string name="top_bar_settings">Settings</string>
 </resources>
