@@ -27,15 +27,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import pt.mf.mybinder.R
-import pt.mf.mybinder.presentation.container.ContainerActivity.Companion.TAG
 import pt.mf.mybinder.presentation.theme.MyBinderTheme
 import pt.mf.mybinder.presentation.theme.Theme
-import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Navigation
 import pt.mf.mybinder.utils.Screen
 import pt.mf.mybinder.utils.Utils
@@ -51,18 +50,23 @@ class ContainerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { MyBinderTheme { SetupLayout(rememberNavController()) } }
+        setContent {
+            MyBinderTheme {
+                val viewModel = viewModel<ContainerViewModel>()
+                SetupLayout(rememberNavController(), viewModel)
+            }
+        }
     }
 }
 
 @Composable
-fun SetupLayout(navController: NavHostController) {
+fun SetupLayout(navController: NavHostController, viewModel: ContainerViewModel) {
     val curBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = curBackStackEntry?.destination?.route ?: Screen.DeckSelectScreen.route
 
     Scaffold(
         topBar = { TopBar(getTitleForRoute(currentDestination)) },
-        bottomBar = { BottomBar(navController) },
+        bottomBar = { BottomBar(navController, viewModel) },
         modifier = Modifier.fillMaxSize(),
         content = { Content(padding = it, navController) }
     )
@@ -96,16 +100,27 @@ fun Content(padding: PaddingValues, navController: NavHostController) {
 }
 
 @Composable
-fun BottomBar(navController: NavController) {
+fun BottomBar(navController: NavController, viewModel: ContainerViewModel) {
     BottomAppBar {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            BottomNavItem(Icons.Default.Edit) { handleDeckOption(navController) }
-            BottomNavItem(Icons.Default.Menu) { handleBinderOption(navController) }
-            BottomNavItem(Icons.Default.Search) { handleSearchOption(navController) }
-            BottomNavItem(Icons.Default.Settings) { handleSettingsOption(navController) }
+            BottomNavItem(Icons.Default.Edit) {
+                viewModel.handleDeckOption(navController)
+            }
+
+            BottomNavItem(Icons.Default.Menu) {
+                viewModel.handleBinderOption(navController)
+            }
+
+            BottomNavItem(Icons.Default.Search) {
+                viewModel.handleSearchOption(navController)
+            }
+
+            BottomNavItem(Icons.Default.Settings) {
+                viewModel.handleSettingsOption(navController)
+            }
         }
     }
 }
@@ -113,28 +128,4 @@ fun BottomBar(navController: NavController) {
 @Composable
 fun BottomNavItem(image: ImageVector, action: () -> Unit) {
     IconButton(onClick = action) { Icon(imageVector = image, contentDescription = null) }
-}
-
-fun handleDeckOption(navController: NavController) {
-    Logger.debug(TAG, "Navigating to DeckSelectScreen.")
-    Utils.tactileFeedback()
-    navController.navigate(Screen.DECK_SELECT_SCREEN)
-}
-
-fun handleBinderOption(navController: NavController) {
-    Logger.debug(TAG, "Navigating to BinderScreen.")
-    Utils.tactileFeedback()
-    navController.navigate(Screen.BINDER_SCREEN)
-}
-
-fun handleSearchOption(navController: NavController) {
-    Logger.debug(TAG, "Navigating to SearchScreen.")
-    Utils.tactileFeedback()
-    navController.navigate(Screen.CARD_SEARCH_SCREEN)
-}
-
-fun handleSettingsOption(navController: NavController) {
-    Logger.debug(TAG, "Navigating to SettingsScreen.")
-    Utils.tactileFeedback()
-    navController.navigate(Screen.SETTINGS_SCREEN)
 }

@@ -41,4 +41,8 @@ object Utils {
         vibrator.vibrate(50)
         Logger.debug(TAG, "Performed legacy vibration.")
     }
+
+    fun String.Companion.empty(): String {
+        return ""
+    }
 }
