@@ -1,6 +1,7 @@
-package pt.mf.mybinder
+package pt.mf.mybinder.utils
 
 import android.app.Application
+import pt.mf.mybinder.utils.MyBinder.HOLDER.TAG
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -12,11 +13,12 @@ class MyBinder : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        context = this
+        ctx = this
+        Logger.debug(TAG, "MyBinder initialized.")
     }
 
     companion object {
-        lateinit var context: MyBinder
+        lateinit var ctx: MyBinder
             private set
     }
 }
