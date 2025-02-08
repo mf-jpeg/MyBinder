@@ -22,7 +22,6 @@ object Utils {
     }
 
     fun tactileFeedback() {
-        Logger.debug(TAG, "Attempting to perform tactile feedback.")
         val vibrator = MyBinder.ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         if (!vibrator.hasVibrator()) {

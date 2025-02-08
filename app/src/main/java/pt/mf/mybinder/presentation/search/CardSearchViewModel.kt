@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
+import pt.mf.mybinder.utils.Utils
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -34,11 +35,13 @@ class CardSearchViewModel : ViewModel() {
             when (val result = cardRepository.searchCard(name)) {
                 is Result.Success -> {
                     Logger.debug(TAG, "Request success!")
+                    Utils.tactileFeedback()
                     modifyLoadingState(isLoading = false)
                 }
 
                 is Result.Error -> {
                     Logger.debug(TAG, "Request error! ${result.exception.message}")
+                    Utils.tactileFeedback()
                     modifyLoadingState(isLoading = false)
                 }
             }
