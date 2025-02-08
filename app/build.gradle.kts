@@ -1,9 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
+
+val props = Properties().apply {
+    load(project.rootProject.file("local.properties").inputStream())
+}
+
+val apiKey: String = props.getProperty("API_KEY") ?: ""
 
 android {
     namespace = "pt.mf.mybinder"
@@ -17,6 +25,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildTypes {
@@ -41,6 +51,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -62,4 +73,8 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.views)
     implementation(libs.kotlin.serialization)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.logging)
+    implementation(libs.gson)
 }

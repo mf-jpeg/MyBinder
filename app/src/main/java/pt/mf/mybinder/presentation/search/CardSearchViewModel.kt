@@ -1,8 +1,14 @@
 package pt.mf.mybinder.presentation.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import pt.mf.mybinder.data.repository.CardRepositoryImpl
+import pt.mf.mybinder.utils.Logger
+import pt.mf.mybinder.utils.Result
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -13,15 +19,33 @@ class CardSearchViewModel : ViewModel() {
     }
 
     data class CardSearchViewState(
-        var counter: Int
+        val isLoading: Boolean = false
     )
 
-    private val _viewState = MutableStateFlow(CardSearchViewState(0))
+    private val _viewState = MutableStateFlow(CardSearchViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun increment() {
-        val current = _viewState.value.counter
-        _viewState.value = _viewState.value.copy(counter = current + 1)
+    private val cardRepository = CardRepositoryImpl()
+
+    fun searchCard(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            modifyLoadingState(isLoading = true)
+
+            when (val result = cardRepository.searchCard(name)) {
+                is Result.Success -> {
+                    Logger.debug(TAG, "Request success!")
+                    modifyLoadingState(isLoading = false)
+                }
+
+                is Result.Error -> {
+                    Logger.debug(TAG, "Request error! ${result.exception.message}")
+                    modifyLoadingState(isLoading = false)
+                }
+            }
+        }
     }
 
+    private fun modifyLoadingState(isLoading: Boolean) {
+        _viewState.value = _viewState.value.copy(isLoading = isLoading)
+    }
 }
