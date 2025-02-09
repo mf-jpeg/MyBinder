@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
 import pt.mf.mybinder.domain.model.Card
+import pt.mf.mybinder.domain.usecase.CardUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
@@ -30,7 +31,7 @@ class CardSearchViewModel : ViewModel() {
     private val _viewState = MutableStateFlow(CardSearchViewState())
     val viewState = _viewState.asStateFlow()
 
-    private val cardRepository = CardRepositoryImpl()
+    private val cardUseCase = CardUseCase(CardRepositoryImpl())
 
     fun searchCard(name: String) {
         Logger.debug(TAG, "Searching for card with title \"$name\".")
@@ -38,7 +39,7 @@ class CardSearchViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             modifyLoadingState(isLoading = true)
 
-            when (val result = cardRepository.searchCard(name)) {
+            when (val result = cardUseCase.searchCard(name)) {
                 is Result.Success -> {
                     Logger.debug(TAG, "Request success!")
                     Utils.tactileFeedback()

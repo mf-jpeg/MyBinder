@@ -10,17 +10,6 @@ import pt.mf.mybinder.utils.Result
  * Created by Martim Ferreira on 08/02/2025
  */
 class CardRepositoryImpl : CardRepository() {
-    private companion object {
-        const val DEFAULT_PAGE_SIZE = 10
-        const val DEFAULT_PAGE_NUMBER = 1
-    }
-
-    override suspend fun searchCard(name: String): Result<CardSearchResponse> {
-        return performHttpRequest {
-            HttpClient.api.searchCard("name:$name", DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER)
-        }
-    }
-
     override suspend fun searchCard(
         name: String,
         pageSize: Int,

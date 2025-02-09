@@ -10,10 +10,6 @@ import pt.mf.mybinder.utils.Result
 abstract class CardRepository : BaseRepository() {
     abstract suspend fun searchCard(
         name: String,
-    ): Result<CardSearchResponse>
-
-    abstract suspend fun searchCard(
-        name: String,
         pageSize: Int,
         pageNumber: Int,
     ): Result<CardSearchResponse>
