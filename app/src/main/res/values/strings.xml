@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">My Binder</string>
+    <!-- General -->
+    <string name="general_app_name">My Binder</string>
+    <string name="general_apply">Apply</string>
 
     <!-- Top Bar -->
     <string name="top_bar_deck">Deck</string>
@@ -11,4 +13,6 @@
 
     <!-- Card Search -->
     <string name="card_search_placeholder">Type card name</string>
+    <string name="card_search_filter_title">Filters</string>
+    <string name="card_search_filter_subtype">Subtype</string>
 </resources>

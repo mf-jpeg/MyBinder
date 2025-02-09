@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -58,11 +60,15 @@ import coil3.request.crossfade
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import pt.mf.mybinder.R
-import pt.mf.mybinder.domain.model.Card
+import pt.mf.mybinder.domain.model.remote.Card
 import pt.mf.mybinder.presentation.search.CardSearchViewModel.CardSearchViewState
 import pt.mf.mybinder.presentation.search.HOLDER.TAG
 import pt.mf.mybinder.presentation.theme.LoadingBackground
 import pt.mf.mybinder.presentation.theme.Theme
+import pt.mf.mybinder.utils.Dimensions.FilterWindowApplyTopPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryEndPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowInnerPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowTitleBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListFabPadding
 import pt.mf.mybinder.utils.Dimensions.ListHorizontalPadding
 import pt.mf.mybinder.utils.Dimensions.ListItemCornerRadius
@@ -99,17 +105,20 @@ fun CardSearchScreen(padding: PaddingValues) {
             .padding(padding)
     ) {
         Column {
-            SearchBar(viewModel)
-            ResultList(listState, viewState, viewModel)
+            SearchBar(viewState, viewModel)
+            Box {
+                ResultList(listState, viewState, viewModel)
+                FilterWindow(viewState.isFilterWindowVisible)
+            }
         }
-        ListFloatingActionButton(listState, coroutineScope)
         ListItemDetails(viewState, viewModel, bottomSheetState)
+        ListFloatingActionButton(listState, coroutineScope)
         LoadingOverlay(viewState.isLoading)
     }
 }
 
 @Composable
-fun SearchBar(viewModel: CardSearchViewModel) {
+fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
     var query by remember { mutableStateOf(String.empty()) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -120,6 +129,15 @@ fun SearchBar(viewModel: CardSearchViewModel) {
         onValueChange = { query = it },
         placeholder = {
             Text(Utils.getString(R.string.card_search_placeholder))
+        },
+        leadingIcon = {
+            IconButton(
+                onClick = {
+                    viewModel.modifyFilterWindowVisibility(!viewState.isFilterWindowVisible)
+                }
+            ) {
+                Icon(imageVector = Icons.Default.FilterList, contentDescription = null)
+            }
         },
         trailingIcon = {
             if (query.isEmpty())
@@ -298,6 +316,79 @@ fun ListFloatingActionButton(listState: LazyListState, coroutineScope: Coroutine
             Icon(Icons.Default.KeyboardArrowUp, contentDescription = null)
         }
     }
+}
+
+@Composable
+fun FilterWindow(isWindowVisible: Boolean) {
+    if (!isWindowVisible)
+        return
+
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier.padding(FilterWindowInnerPadding)
+        ) {
+            Text(
+                text = Utils.getString(R.string.card_search_filter_title),
+                color = Theme.getPrimary(),
+                modifier = Modifier.padding(bottom = FilterWindowTitleBottomPadding)
+            )
+
+            Row {
+                Text(
+                    text = "${Utils.getString(R.string.card_search_filter_subtype)}:",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = FilterWindowCategoryEndPadding)
+                )
+                FilterSubtypeList()
+            }
+
+            Text(
+                text = Utils.getString(R.string.general_apply),
+                color = Theme.getPrimary(),
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = FilterWindowApplyTopPadding)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterSubtypeList() {
+//    var isExpanded by remember { mutableStateOf(false) }
+//    var selectedOption by remember { mutableStateOf(options.first()) }
+//
+//    ExposedDropdownMenuBox(
+//        expanded = isExpanded,
+//        onExpandedChange = { isExpanded = it }
+//    ) {
+//        OutlinedTextField(
+//            value = selectedOption,
+//            onValueChange = {},
+//            readOnly = true,
+//            modifier = Modifier.menuAnchor(PrimaryNotEditable, true),
+//        )
+//
+//        ExposedDropdownMenu(
+//            expanded = isExpanded,
+//            onDismissRequest = { isExpanded = false }
+//        ) {
+//            options.forEach { option ->
+//                DropdownMenuItem(
+//                    text = { Text(text = option) },
+//                    onClick = {
+//                        selectedOption = option
+//                        isExpanded = false
+//                    }
+//                )
+//            }
+//        }
+//    }
 }
 
 @Composable

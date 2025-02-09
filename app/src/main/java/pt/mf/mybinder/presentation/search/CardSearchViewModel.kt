@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pt.mf.mybinder.data.repository.CardRepositoryImpl
-import pt.mf.mybinder.domain.model.Card
-import pt.mf.mybinder.domain.usecase.CardUseCase
+import pt.mf.mybinder.data.repository.remote.CardRepositoryImpl
+import pt.mf.mybinder.domain.model.remote.Card
+import pt.mf.mybinder.domain.usecase.remote.CardUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
@@ -24,8 +24,9 @@ class CardSearchViewModel : ViewModel() {
 
     data class CardSearchViewState(
         val isLoading: Boolean = false,
+        val isFilterWindowVisible: Boolean = false,
         val cards: List<Card> = listOf(),
-        val selectedCardId: String = String.empty()
+        val selectedCardId: String = String.empty(),
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -37,25 +38,29 @@ class CardSearchViewModel : ViewModel() {
         Logger.debug(TAG, "Searching for card with title \"$name\".")
 
         viewModelScope.launch(Dispatchers.IO) {
-            modifyLoadingState(isLoading = true)
+            modifyLoadingVisibility(isLoading = true)
 
             when (val result = cardUseCase.searchCard(name)) {
                 is Result.Success -> {
                     Utils.tactileFeedback()
                     populateCardList(result.data.data)
-                    modifyLoadingState(isLoading = false)
+                    modifyLoadingVisibility(isLoading = false)
                 }
 
                 is Result.Error -> {
                     Utils.tactileFeedback()
-                    modifyLoadingState(isLoading = false)
+                    modifyLoadingVisibility(isLoading = false)
                 }
             }
         }
     }
 
-    private fun modifyLoadingState(isLoading: Boolean) {
+    private fun modifyLoadingVisibility(isLoading: Boolean) {
         _viewState.value = _viewState.value.copy(isLoading = isLoading)
+    }
+
+    fun modifyFilterWindowVisibility(isVisibile: Boolean) {
+        _viewState.value = _viewState.value.copy(isFilterWindowVisible = isVisibile)
     }
 
     private fun populateCardList(cards: List<Card>) {
