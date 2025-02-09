@@ -16,5 +16,8 @@
     <string name="card_search_filter_title">Filters</string>
     <string name="card_search_filter_subtype">Type</string>
     <string name="card_search_filter_set">Set</string>
+    <string name="card_search_filter_order">Order</string>
+    <string name="card_search_filter_order_alpha">Alpha</string>
+    <string name="card_search_filter_order_chrono">Chrono</string>
     <string name="card_search_filter_filter_not_ready">Filter will be available in a moment.</string>
 </resources>

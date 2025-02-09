@@ -16,9 +16,14 @@ object Dimensions {
     val ListItemInfoLeftPadding = 8.dp
     val ListFabPadding = 24.dp
     val ListItemDetailsBottomPadding = 24.dp
+
+    // Card Search Filter
+    val FilterWindowElevation = 6.dp
     val FilterWindowOutterPadding = 12.dp
     val FilterWindowInnerPadding = 24.dp
     val FilterWindowTitleBottomPadding = 24.dp
-    val FilterWindowCategoryEndPadding = 12.dp
+    val FilterWindowCategoryTitleEndPadding = 12.dp
     val FilterWindowApplyTopPadding = 24.dp
+    val FilterWindowDropdownCornerRadius = 12.dp
+    val FilterWindowCategoryRowTopPadding = 4.dp
 }

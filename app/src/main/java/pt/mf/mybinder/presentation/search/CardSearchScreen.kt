@@ -33,10 +33,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonColors
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -70,7 +73,10 @@ import pt.mf.mybinder.presentation.search.HOLDER.TAG
 import pt.mf.mybinder.presentation.theme.LoadingBackground
 import pt.mf.mybinder.presentation.theme.Theme
 import pt.mf.mybinder.utils.Dimensions.FilterWindowApplyTopPadding
-import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryEndPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryRowTopPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryTitleEndPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowDropdownCornerRadius
+import pt.mf.mybinder.utils.Dimensions.FilterWindowElevation
 import pt.mf.mybinder.utils.Dimensions.FilterWindowInnerPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowOutterPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowTitleBottomPadding
@@ -334,6 +340,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
     }
 
     ElevatedCard(
+        elevation = CardDefaults.elevatedCardElevation(FilterWindowElevation),
         modifier = Modifier
             .fillMaxWidth()
             .padding(FilterWindowOutterPadding)
@@ -352,19 +359,43 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                     text = "${Utils.getString(R.string.card_search_filter_subtype)}:",
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(end = FilterWindowCategoryEndPadding)
+                        .padding(end = FilterWindowCategoryTitleEndPadding)
+                        .weight(1f)
                 )
-                FilterList(viewState.subtypes.map { it.name })
+                FilterDropdown(viewState.subtypes.map { it.name }, Modifier.weight(4f))
             }
 
-            Row {
+            Row(
+                modifier = Modifier.padding(top = FilterWindowCategoryRowTopPadding)
+            ) {
                 Text(
                     text = "${Utils.getString(R.string.card_search_filter_set)}:",
                     modifier = Modifier
                         .align(Alignment.CenterVertically)
-                        .padding(end = FilterWindowCategoryEndPadding)
+                        .padding(end = FilterWindowCategoryTitleEndPadding)
+                        .weight(1f)
                 )
-                FilterList(viewState.sets.map { it.name })
+                FilterDropdown(viewState.sets.map { it.name }, Modifier.weight(4f))
+            }
+
+            Row(
+                modifier = Modifier.padding(top = FilterWindowCategoryRowTopPadding)
+            ) {
+                Text(
+                    text = "${Utils.getString(R.string.card_search_filter_order)}:",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = FilterWindowCategoryTitleEndPadding)
+                        .weight(1f)
+                )
+
+                FilterOrderBy(
+                    listOf(
+                        Utils.getString(R.string.card_search_filter_order_alpha),
+                        Utils.getString(R.string.card_search_filter_order_chrono)
+                    ),
+                    modifier = Modifier.weight(4f)
+                )
             }
 
             Text(
@@ -381,18 +412,24 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterList(options: List<String>) {
+fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
     var isExpanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(options.firstOrNull()) }
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        onExpandedChange = { isExpanded = it }
+        onExpandedChange = { isExpanded = it },
+        modifier = modifier
     ) {
-        OutlinedTextField(
+        TextField(
             value = selectedOption ?: String.empty(),
             onValueChange = {},
             readOnly = true,
+            shape = RoundedCornerShape(FilterWindowDropdownCornerRadius),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
             modifier = Modifier.menuAnchor(PrimaryNotEditable, true),
         )
 
@@ -409,6 +446,30 @@ fun FilterList(options: List<String>) {
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun FilterOrderBy(options: List<String>, modifier: Modifier) {
+    var selectedOption by remember { mutableStateOf(options.first()) }
+
+    Row(modifier = modifier) {
+        options.forEach { option ->
+            RadioButton(
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = Theme.getPrimary()
+                ),
+                selected = (option == selectedOption),
+                onClick = { selectedOption = option }
+            )
+
+            Text(
+                text = option,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(end = FilterWindowCategoryTitleEndPadding)
+            )
         }
     }
 }
