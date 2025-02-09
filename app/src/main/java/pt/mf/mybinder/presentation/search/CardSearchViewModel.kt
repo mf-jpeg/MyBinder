@@ -37,7 +37,8 @@ class CardSearchViewModel : ViewModel() {
         val cards: List<Card> = listOf(),
         val selectedCardId: String = String.empty(),
         val subtypes: List<Subtype> = listOf(),
-        val sets: List<Set> = listOf()
+        val sets: List<Set> = listOf(),
+        val selectOrderIndex: Int = 0
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -100,6 +101,11 @@ class CardSearchViewModel : ViewModel() {
                 Preferences.getPref<Boolean>(SUBTYPES_READY_KEY)
     }
 
+    // TODO
+    fun applyFilters() {
+        Logger.debug(TAG, "Applying filters.")
+    }
+
     private fun modifyLoadingVisibility(isLoading: Boolean) {
         _viewState.value = _viewState.value.copy(isLoading = isLoading)
     }
@@ -122,5 +128,9 @@ class CardSearchViewModel : ViewModel() {
 
     fun clearClickedCardId() {
         _viewState.value = _viewState.value.copy(selectedCardId = String.empty())
+    }
+
+    fun modifySelectedOrderIndex(index: Int) {
+        _viewState.value = _viewState.value.copy(selectOrderIndex = index)
     }
 }

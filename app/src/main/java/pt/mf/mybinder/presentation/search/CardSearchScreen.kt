@@ -34,7 +34,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -52,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -117,11 +117,13 @@ fun CardSearchScreen(padding: PaddingValues) {
     ) {
         Column {
             SearchBar(viewState, viewModel)
+
             Box {
                 ResultList(listState, viewState, viewModel)
                 FilterWindow(viewState, viewModel)
             }
         }
+
         ListItemDetails(viewState, viewModel, bottomSheetState)
         ListFloatingActionButton(listState, coroutineScope)
         LoadingOverlay(viewState.isLoading)
@@ -144,6 +146,9 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
         leadingIcon = {
             IconButton(
                 onClick = {
+                    Utils.tactileFeedback()
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
                     viewModel.modifyFilterWindowVisibility(!viewState.isFilterWindowVisible)
                 }
             ) {
@@ -179,6 +184,9 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .focusRequester(focusRequester)
+            .onFocusChanged {
+                viewModel.modifyFilterWindowVisibility(isVisibile = false)
+            }
     )
 }
 
@@ -213,6 +221,7 @@ fun ListItem(card: Card, viewModel: CardSearchViewModel) {
             .padding(bottom = ListItemOuterBottomPadding)
             .clickable {
                 Logger.debug(TAG, "Tapped card with id \"${card.id}\"")
+                viewModel.modifyFilterWindowVisibility(isVisibile = false)
                 viewModel.modifySelectedCardId(card.id)
             }
     ) {
@@ -394,18 +403,41 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         Utils.getString(R.string.card_search_filter_order_alpha),
                         Utils.getString(R.string.card_search_filter_order_chrono)
                     ),
+                    viewModel,
                     modifier = Modifier.weight(4f)
                 )
             }
 
-            Text(
-                text = Utils.getString(R.string.general_apply),
-                color = Theme.getPrimary(),
-                textAlign = TextAlign.End,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = FilterWindowApplyTopPadding)
-            )
+            ) {
+                Text(
+                    text = Utils.getString(R.string.general_close),
+                    color = Theme.getPrimary(),
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            viewModel.modifyFilterWindowVisibility(isVisibile = false)
+                            Utils.tactileFeedback()
+                        }
+                )
+
+                Text(
+                    text = Utils.getString(R.string.general_apply),
+                    color = Theme.getPrimary(),
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable {
+                            viewModel.modifyFilterWindowVisibility(isVisibile = false)
+                            Utils.tactileFeedback()
+                            viewModel.applyFilters()
+                        }
+                )
+            }
         }
     }
 }
@@ -451,7 +483,11 @@ fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FilterOrderBy(options: List<String>, modifier: Modifier) {
+fun FilterOrderBy(
+    options: List<String>,
+    viewModel: CardSearchViewModel,
+    modifier: Modifier
+) {
     var selectedOption by remember { mutableStateOf(options.first()) }
 
     Row(modifier = modifier) {
@@ -461,7 +497,10 @@ fun FilterOrderBy(options: List<String>, modifier: Modifier) {
                     selectedColor = Theme.getPrimary()
                 ),
                 selected = (option == selectedOption),
-                onClick = { selectedOption = option }
+                onClick = {
+                    selectedOption = option
+                    viewModel.modifySelectedOrderIndex(options.indexOf(selectedOption))
+                }
             )
 
             Text(

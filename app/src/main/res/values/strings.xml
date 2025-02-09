@@ -4,6 +4,7 @@
     <!-- General -->
     <string name="general_app_name">My Binder</string>
     <string name="general_apply">Apply</string>
+    <string name="general_close">Close</string>
 
     <!-- Top Bar -->
     <string name="top_bar_deck">Deck</string>
@@ -19,5 +20,5 @@
     <string name="card_search_filter_order">Order</string>
     <string name="card_search_filter_order_alpha">Alpha</string>
     <string name="card_search_filter_order_chrono">Chrono</string>
-    <string name="card_search_filter_filter_not_ready">Filter will be available in a moment.</string>
+    <string name="card_search_filter_filter_not_ready">Search filter will be available shortly.</string>
 </resources>
