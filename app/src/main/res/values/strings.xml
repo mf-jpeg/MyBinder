@@ -8,4 +8,7 @@
     <string name="top_bar_binder">Binder</string>
     <string name="top_bar_search">Card Search</string>
     <string name="top_bar_settings">Settings</string>
+
+    <!-- Card Search -->
+    <string name="card_search_placeholder">Type card name</string>
 </resources>

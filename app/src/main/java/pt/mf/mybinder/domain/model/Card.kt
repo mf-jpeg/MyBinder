@@ -15,7 +15,7 @@ data class Card(
     val set: Set,
     val number: String,
     val images: Images,
-    @SerializedName("cardmarket") val cardMarket: CardMarket
+    @SerializedName("cardmarket") val cardMarket: CardMarket?
 ) {
     data class Set(
         val id: String,

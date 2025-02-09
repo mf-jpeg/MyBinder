@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
+import pt.mf.mybinder.domain.model.Card
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
@@ -20,7 +21,8 @@ class CardSearchViewModel : ViewModel() {
     }
 
     data class CardSearchViewState(
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val cards: List<Card> = listOf()
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -29,6 +31,8 @@ class CardSearchViewModel : ViewModel() {
     private val cardRepository = CardRepositoryImpl()
 
     fun searchCard(name: String) {
+        Logger.debug(TAG, "Searching for card with title \"$name\".")
+
         viewModelScope.launch(Dispatchers.IO) {
             modifyLoadingState(isLoading = true)
 
@@ -36,11 +40,12 @@ class CardSearchViewModel : ViewModel() {
                 is Result.Success -> {
                     Logger.debug(TAG, "Request success!")
                     Utils.tactileFeedback()
+                    populateCardList(result.data.data)
                     modifyLoadingState(isLoading = false)
                 }
 
                 is Result.Error -> {
-                    Logger.debug(TAG, "Request error! ${result.exception.message}")
+                    Logger.error(TAG, "Request error! ${result.exception.message}")
                     Utils.tactileFeedback()
                     modifyLoadingState(isLoading = false)
                 }
@@ -50,5 +55,13 @@ class CardSearchViewModel : ViewModel() {
 
     private fun modifyLoadingState(isLoading: Boolean) {
         _viewState.value = _viewState.value.copy(isLoading = isLoading)
+    }
+
+    private fun populateCardList(cards: List<Card>) {
+        _viewState.value = _viewState.value.copy(cards = cards)
+    }
+
+    fun clearCardList() {
+        _viewState.value = _viewState.value.copy(cards = listOf())
     }
 }

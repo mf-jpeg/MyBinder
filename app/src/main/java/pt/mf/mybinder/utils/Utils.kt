@@ -44,4 +44,8 @@ object Utils {
     fun String.Companion.empty(): String {
         return ""
     }
+
+    fun formatPrice(price: Float?): String {
+        return if (price != null) "Low: $price€" else "Low: N/A"
+    }
 }

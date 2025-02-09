@@ -11,7 +11,7 @@ import pt.mf.mybinder.utils.Result
  */
 class CardRepositoryImpl : CardRepository() {
     private companion object {
-        const val DEFAULT_PAGE_SIZE = 20
+        const val DEFAULT_PAGE_SIZE = 10
         const val DEFAULT_PAGE_NUMBER = 1
     }
 
