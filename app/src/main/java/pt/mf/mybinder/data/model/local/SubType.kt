@@ -8,6 +8,5 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Subtype(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String,
+    @PrimaryKey(autoGenerate = false) val name: String,
 )

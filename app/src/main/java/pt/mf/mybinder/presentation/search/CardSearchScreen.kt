@@ -151,7 +151,6 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                     Utils.tactileFeedback()
                     keyboardController?.hide()
                     focusManager.clearFocus()
-                    viewModel.modifyisNothingToDisplay(false)
                     viewModel.modifyFilterWindowVisibility(!viewState.isFilterWindowVisible)
                 }
             ) {
@@ -181,6 +180,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                 viewModel.clearCardList()
                 keyboardController?.hide()
                 focusManager.clearFocus()
+                viewModel.modifyisNothingToDisplay(false)
                 viewModel.searchCard(query.trim())
             }
         ),
@@ -502,6 +502,7 @@ fun FilterOrderBy(
                 selected = (option == selectedOption),
                 onClick = {
                     selectedOption = option
+                    Utils.tactileFeedback()
                     viewModel.modifySelectedOrderIndex(options.indexOf(selectedOption))
                 }
             )
