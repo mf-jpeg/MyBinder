@@ -298,7 +298,6 @@ fun ListFloatingActionButton(listState: LazyListState, coroutineScope: Coroutine
             Icon(Icons.Default.KeyboardArrowUp, contentDescription = null)
         }
     }
-
 }
 
 @Composable
