@@ -9,9 +9,9 @@ import retrofit2.Response
  * Created by Martim Ferreira on 09/02/2025
  */
 interface SetRepository {
-    suspend fun remoteFetchSets(): Response<SetResponse>
-    suspend fun localFetchSets(): Flow<List<Set>>
-    suspend fun localFetchSetById(id: String): Flow<Set?>
+    suspend fun fetchRemoteSets(): Response<SetResponse>
+    suspend fun fetchLocalSets(): Flow<List<Set>>
+    suspend fun fetchLocalSetById(id: String): Flow<Set?>
     suspend fun insertSet(set: Set)
     suspend fun insertSets(sets: List<Set>)
 }

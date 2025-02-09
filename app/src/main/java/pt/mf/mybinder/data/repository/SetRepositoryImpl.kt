@@ -15,7 +15,7 @@ import retrofit2.Response
 class SetRepositoryImpl() : SetRepository {
     private val dao: SetDao = MyBinderDatabase.instance.setDao
 
-    override suspend fun remoteFetchSets(): Response<SetResponse> {
+    override suspend fun fetchRemoteSets(): Response<SetResponse> {
         return HttpClient.api.fetchSets()
     }
 
@@ -27,11 +27,11 @@ class SetRepositoryImpl() : SetRepository {
         dao.insertSets(sets)
     }
 
-    override suspend fun localFetchSets(): Flow<List<Set>> {
+    override suspend fun fetchLocalSets(): Flow<List<Set>> {
         return dao.getAll()
     }
 
-    override suspend fun localFetchSetById(id: String): Flow<Set?> {
+    override suspend fun fetchLocalSetById(id: String): Flow<Set?> {
         return dao.getById(id)
     }
 }

@@ -31,3 +31,7 @@ Look up a card by setting any combination of the following parameters:
 #### Settings (WIP)
 
 Customize how the app behaves on your device.
+
+### Libraries
+
+WIP

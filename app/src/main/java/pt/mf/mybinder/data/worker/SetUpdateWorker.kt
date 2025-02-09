@@ -27,7 +27,7 @@ class SetUpdateWorker(
 
         val result = withContext(Dispatchers.IO) {
             Logger.debug(TAG, "Running periodic $TAG routine.")
-            useCase.remoteFetchSets()
+            useCase.fetchRemoteSets()
         }
 
         return when (result) {

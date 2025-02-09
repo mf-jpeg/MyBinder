@@ -6,9 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pt.mf.mybinder.data.model.local.Subtype
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
+import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
 import pt.mf.mybinder.domain.usecase.CardUseCase
+import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
@@ -27,12 +30,18 @@ class CardSearchViewModel : ViewModel() {
         val isFilterWindowVisible: Boolean = false,
         val cards: List<Card> = listOf(),
         val selectedCardId: String = String.empty(),
+        val subtypes: List<Subtype> = listOf()
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
     val viewState = _viewState.asStateFlow()
 
     private val cardUseCase = CardUseCase(CardRepositoryImpl())
+    private val subtypeUseCase = SubtypeUseCase(SubtypeRepositoryImpl())
+
+    init {
+        fetchLocalSubtypes()
+    }
 
     fun searchCard(name: String) {
         Logger.debug(TAG, "Searching for card with title \"$name\".")
@@ -51,6 +60,17 @@ class CardSearchViewModel : ViewModel() {
                     Utils.tactileFeedback()
                     modifyLoadingVisibility(isLoading = false)
                 }
+            }
+        }
+    }
+
+    private fun fetchLocalSubtypes() {
+        modifyLoadingVisibility(isLoading = true)
+
+        viewModelScope.launch {
+            subtypeUseCase.fetchLocalSubtypes().collect {
+                _viewState.value = _viewState.value.copy(subtypes = it)
+                modifyLoadingVisibility(isLoading = false)
             }
         }
     }

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
  * Created by Martim Ferreira on 09/02/2025
  */
 @Entity
-data class SubType(
+data class Subtype(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
 )

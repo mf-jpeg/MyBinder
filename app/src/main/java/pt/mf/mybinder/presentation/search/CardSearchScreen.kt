@@ -24,12 +24,16 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -108,7 +112,7 @@ fun CardSearchScreen(padding: PaddingValues) {
             SearchBar(viewState, viewModel)
             Box {
                 ResultList(listState, viewState, viewModel)
-                FilterWindow(viewState.isFilterWindowVisible)
+                FilterWindow(viewState)
             }
         }
         ListItemDetails(viewState, viewModel, bottomSheetState)
@@ -319,8 +323,8 @@ fun ListFloatingActionButton(listState: LazyListState, coroutineScope: Coroutine
 }
 
 @Composable
-fun FilterWindow(isWindowVisible: Boolean) {
-    if (!isWindowVisible)
+fun FilterWindow(viewState: CardSearchViewState) {
+    if (!viewState.isFilterWindowVisible)
         return
 
     ElevatedCard(
@@ -342,7 +346,7 @@ fun FilterWindow(isWindowVisible: Boolean) {
                         .align(Alignment.CenterVertically)
                         .padding(end = FilterWindowCategoryEndPadding)
                 )
-                FilterSubtypeList()
+                FilterSubtypeList(viewState)
             }
 
             Text(
@@ -359,36 +363,36 @@ fun FilterWindow(isWindowVisible: Boolean) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterSubtypeList() {
-//    var isExpanded by remember { mutableStateOf(false) }
-//    var selectedOption by remember { mutableStateOf(options.first()) }
-//
-//    ExposedDropdownMenuBox(
-//        expanded = isExpanded,
-//        onExpandedChange = { isExpanded = it }
-//    ) {
-//        OutlinedTextField(
-//            value = selectedOption,
-//            onValueChange = {},
-//            readOnly = true,
-//            modifier = Modifier.menuAnchor(PrimaryNotEditable, true),
-//        )
-//
-//        ExposedDropdownMenu(
-//            expanded = isExpanded,
-//            onDismissRequest = { isExpanded = false }
-//        ) {
-//            options.forEach { option ->
-//                DropdownMenuItem(
-//                    text = { Text(text = option) },
-//                    onClick = {
-//                        selectedOption = option
-//                        isExpanded = false
-//                    }
-//                )
-//            }
-//        }
-//    }
+fun FilterSubtypeList(viewState: CardSearchViewState) {
+    var isExpanded by remember { mutableStateOf(false) }
+    var selectedOption by remember { mutableStateOf(viewState.subtypes.first()) }
+
+    ExposedDropdownMenuBox(
+        expanded = isExpanded,
+        onExpandedChange = { isExpanded = it }
+    ) {
+        OutlinedTextField(
+            value = selectedOption.name,
+            onValueChange = {},
+            readOnly = true,
+            modifier = Modifier.menuAnchor(PrimaryNotEditable, true),
+        )
+
+        ExposedDropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false }
+        ) {
+            viewState.subtypes.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(text = option.name) },
+                    onClick = {
+                        selectedOption = option
+                        isExpanded = false
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable

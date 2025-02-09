@@ -27,13 +27,13 @@ class WorkManager {
             generateWorkRequest<SetUpdateWorker>(15, TimeUnit.MINUTES)
 
         val subTypesPeriodicRequest =
-            generateWorkRequest<SubTypesUpdateWorker>(15, TimeUnit.MINUTES)
+            generateWorkRequest<SubtypeUpdateWorker>(15, TimeUnit.MINUTES)
 
         Logger.debug(TAG, "Enqueueing SetUpdateWorker.")
         enqueueWorkRequest(SetUpdateWorker.TAG, setPeriodicRequest)
 
         Logger.debug(TAG, "Enqueueing SubTypesUpdateWorker.")
-        enqueueWorkRequest(SubTypesUpdateWorker.TAG, subTypesPeriodicRequest)
+        enqueueWorkRequest(SubtypeUpdateWorker.TAG, subTypesPeriodicRequest)
 
         Logger.debug(TAG, "Finished scheduling workers.")
     }

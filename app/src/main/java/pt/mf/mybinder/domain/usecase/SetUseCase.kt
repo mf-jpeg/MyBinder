@@ -12,7 +12,7 @@ import pt.mf.mybinder.domain.model.remote.Set as RemoteSet
  * Created by Martim Ferreira on 09/02/2025
  */
 class SetUseCase(private val repository: SetRepository) : BaseUseCase() {
-    suspend fun remoteFetchSets(): Result<SetResponse> {
+    suspend fun fetchRemoteSets(): Result<SetResponse> {
         return performHttpRequest { HttpClient.api.fetchSets() }
     }
 
@@ -24,12 +24,12 @@ class SetUseCase(private val repository: SetRepository) : BaseUseCase() {
         repository.insertSets(sets)
     }
 
-    suspend fun localFetchSets(): Flow<List<LocalSet>> {
-        return repository.localFetchSets()
+    suspend fun fetchLocalSets(): Flow<List<LocalSet>> {
+        return repository.fetchLocalSets()
     }
 
-    suspend fun localFetchSetById(id: String): Flow<LocalSet?> {
-        return repository.localFetchSetById(id)
+    suspend fun fetchLocalSetById(id: String): Flow<LocalSet?> {
+        return repository.fetchLocalSetById(id)
     }
 
     fun convertRemoteToLocalSet(set: RemoteSet): LocalSet {
