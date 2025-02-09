@@ -111,7 +111,7 @@ fun CardSearchScreen(padding: PaddingValues) {
 
 @Composable
 fun SearchBar(viewModel: CardSearchViewModel) {
-    var query by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf(String.empty()) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -184,8 +184,8 @@ fun ListItem(card: Card, viewModel: CardSearchViewModel) {
             .fillMaxWidth()
             .padding(bottom = ListItemOuterBottomPadding)
             .clickable {
-                Logger.debug(TAG, "Selected card with id \"${card.id}\"")
-                viewModel.modifyClickedCardId(card.id)
+                Logger.debug(TAG, "Tapped card with id \"${card.id}\"")
+                viewModel.modifySelectedCardId(card.id)
             }
     ) {
         Row(
@@ -230,18 +230,19 @@ fun ListItemDetails(
     viewModel: CardSearchViewModel,
     bottomSheetState: SheetState
 ) {
-    val card = viewState.cards.find { it.id == viewState.clickedCardId }
+    val card = viewState.cards.find { it.id == viewState.selectedCardId }
     var imageLoaded by remember { mutableStateOf(false) }
 
     if (card == null)
         return
 
-    Logger.debug(TAG, "Opened ModalBottomSheet for card with id \"${card.id}\".")
+    val id = "\"${card.id}\""
+    Logger.debug(TAG, "Opened sheet for card with id $id.")
 
     ModalBottomSheet(
         sheetState = bottomSheetState,
         onDismissRequest = {
-            Logger.debug(TAG, "Closed ModalBottomSheet.")
+            Logger.debug(TAG, "Closed sheet for card with id $id.")
             viewModel.clearClickedCardId()
         }
     ) {
