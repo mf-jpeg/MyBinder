@@ -91,7 +91,6 @@ fun CardSearchScreen(padding: PaddingValues) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     val coroutineScope = rememberCoroutineScope()
 
     Box(

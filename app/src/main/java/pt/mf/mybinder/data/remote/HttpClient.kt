@@ -13,11 +13,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 object HttpClient {
     private const val BASE_URL = "https://api.pokemontcg.io/v2/"
 
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    private val authInterceptor = Interceptor { chain ->
+    private val auth = Interceptor { chain ->
         val request = chain.request().newBuilder()
             .addHeader("X-Api-Key", BuildConfig.API_KEY)
             .build()
@@ -26,16 +26,16 @@ object HttpClient {
     }
 
     private val client = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(loggingInterceptor)
+        .addInterceptor(auth)
+        .addInterceptor(logging)
         .build()
 
-    val api: CardApi by lazy {
+    val api: HttpApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(CardApi::class.java)
+            .create(HttpApi::class.java)
     }
 }

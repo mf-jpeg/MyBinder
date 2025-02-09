@@ -10,7 +10,7 @@ import retrofit2.http.Query
 /**
  * Created by Martim Ferreira on 08/02/2025
  */
-interface CardApi {
+interface HttpApi {
     @GET("cards/")
     suspend fun searchCard(
         @Query("q") name: String,
