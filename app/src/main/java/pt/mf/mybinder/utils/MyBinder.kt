@@ -1,6 +1,7 @@
 package pt.mf.mybinder.utils
 
 import android.app.Application
+import pt.mf.mybinder.data.worker.WorkManager
 import pt.mf.mybinder.utils.MyBinder.HOLDER.TAG
 
 /**
@@ -15,6 +16,7 @@ class MyBinder : Application() {
         super.onCreate()
         ctx = this
         Logger.debug(TAG, "MyBinder initialized.")
+        WorkManager().scheduleWorkers()
     }
 
     companion object {

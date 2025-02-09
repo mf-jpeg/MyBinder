@@ -1,20 +1,20 @@
 package pt.mf.mybinder.domain.repository
 
-import pt.mf.mybinder.data.model.CardDetailsResponse
-import pt.mf.mybinder.data.model.CardSearchResponse
-import pt.mf.mybinder.utils.Result
+import pt.mf.mybinder.data.model.remote.CardDetailsResponse
+import pt.mf.mybinder.data.model.remote.CardSearchResponse
+import retrofit2.Response
 
 /**
  * Created by Martim Ferreira on 08/02/2025
  */
-abstract class CardRepository : BaseRepository() {
-    abstract suspend fun searchCard(
+interface CardRepository {
+    suspend fun searchCard(
         name: String,
         pageSize: Int,
         pageNumber: Int,
-    ): Result<CardSearchResponse>
+    ): Response<CardSearchResponse>
 
-    abstract suspend fun fetchCardDetails(
+    suspend fun fetchCardDetails(
         id: String
-    ): Result<CardDetailsResponse>
+    ): Response<CardDetailsResponse>
 }

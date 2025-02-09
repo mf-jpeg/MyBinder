@@ -1,13 +1,13 @@
-package pt.mf.mybinder.domain.repository
+package pt.mf.mybinder.domain.usecase
 
 import okio.IOException
 import pt.mf.mybinder.utils.Result
 import retrofit2.Response
 
 /**
- * Created by Martim Ferreira on 08/02/2025
+ * Created by Martim Ferreira on 09/02/2025
  */
-abstract class BaseRepository {
+abstract class BaseUseCase {
     protected suspend fun <T> performHttpRequest(
         request: suspend () -> Response<T>,
     ): Result<T> {

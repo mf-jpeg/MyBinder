@@ -1,4 +1,4 @@
-package pt.mf.mybinder.domain.model
+package pt.mf.mybinder.domain.model.remote
 
 import com.google.gson.annotations.SerializedName
 

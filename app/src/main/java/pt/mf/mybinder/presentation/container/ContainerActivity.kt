@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -93,7 +93,7 @@ fun getTitleForRoute(route: String): String {
         Screen.BinderScreen.route -> Utils.getString(R.string.top_bar_binder)
         Screen.CardSearchScreen.route -> Utils.getString(R.string.top_bar_search)
         Screen.SettingsScreen.route -> Utils.getString(R.string.top_bar_settings)
-        else -> Utils.getString(R.string.app_name)
+        else -> Utils.getString(R.string.general_app_name)
     }
 }
 
@@ -113,7 +113,7 @@ fun BottomBar(navController: NavController, viewModel: ContainerViewModel) {
                 viewModel.handleDeckOption(navController)
             }
 
-            BottomNavItem(Icons.Default.Menu, modifier = Modifier.weight(1f)) {
+            BottomNavItem(Icons.Default.Storage, modifier = Modifier.weight(1f)) {
                 viewModel.handleBinderOption(navController)
             }
 
