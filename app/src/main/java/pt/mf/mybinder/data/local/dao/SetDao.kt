@@ -17,7 +17,7 @@ interface SetDao {
     @Upsert
     fun insertSets(sets: List<Set>)
 
-    @Query("SELECT * FROM `set` ORDER BY releaseDate ASC")
+    @Query("SELECT * FROM `set` ORDER BY releaseDate DESC")
     fun getAll(): Flow<List<Set>>
 
     @Query("SELECT * FROM `set` WHERE id=:id LIMIT 1")

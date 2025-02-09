@@ -14,5 +14,6 @@
     <!-- Card Search -->
     <string name="card_search_placeholder">Type card name</string>
     <string name="card_search_filter_title">Filters</string>
-    <string name="card_search_filter_subtype">Subtype</string>
+    <string name="card_search_filter_subtype">Type</string>
+    <string name="card_search_filter_set">Set</string>
 </resources>

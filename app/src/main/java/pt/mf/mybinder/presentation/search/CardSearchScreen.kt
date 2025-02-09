@@ -72,6 +72,7 @@ import pt.mf.mybinder.presentation.theme.Theme
 import pt.mf.mybinder.utils.Dimensions.FilterWindowApplyTopPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryEndPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowInnerPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowOutterPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowTitleBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListFabPadding
 import pt.mf.mybinder.utils.Dimensions.ListHorizontalPadding
@@ -328,7 +329,9 @@ fun FilterWindow(viewState: CardSearchViewState) {
         return
 
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(FilterWindowOutterPadding)
     ) {
         Column(
             modifier = Modifier.padding(FilterWindowInnerPadding)
@@ -346,7 +349,17 @@ fun FilterWindow(viewState: CardSearchViewState) {
                         .align(Alignment.CenterVertically)
                         .padding(end = FilterWindowCategoryEndPadding)
                 )
-                FilterSubtypeList(viewState)
+                FilterList(viewState.subtypes.map { it.name })
+            }
+
+            Row {
+                Text(
+                    text = "${Utils.getString(R.string.card_search_filter_set)}:",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = FilterWindowCategoryEndPadding)
+                )
+                FilterList(viewState.sets.map { it.name })
             }
 
             Text(
@@ -363,16 +376,16 @@ fun FilterWindow(viewState: CardSearchViewState) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterSubtypeList(viewState: CardSearchViewState) {
+fun FilterList(options: List<String>) {
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(viewState.subtypes.first()) }
+    var selectedOption by remember { mutableStateOf(options.first()) }
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         onExpandedChange = { isExpanded = it }
     ) {
         OutlinedTextField(
-            value = selectedOption.name,
+            value = selectedOption,
             onValueChange = {},
             readOnly = true,
             modifier = Modifier.menuAnchor(PrimaryNotEditable, true),
@@ -382,9 +395,9 @@ fun FilterSubtypeList(viewState: CardSearchViewState) {
             expanded = isExpanded,
             onDismissRequest = { isExpanded = false }
         ) {
-            viewState.subtypes.forEach { option ->
+            options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option.name) },
+                    text = { Text(text = option) },
                     onClick = {
                         selectedOption = option
                         isExpanded = false

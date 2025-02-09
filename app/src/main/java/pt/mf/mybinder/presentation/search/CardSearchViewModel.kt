@@ -6,11 +6,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pt.mf.mybinder.data.model.local.Set
 import pt.mf.mybinder.data.model.local.Subtype
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
+import pt.mf.mybinder.data.repository.SetRepositoryImpl
 import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
 import pt.mf.mybinder.domain.usecase.CardUseCase
+import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
@@ -30,7 +33,8 @@ class CardSearchViewModel : ViewModel() {
         val isFilterWindowVisible: Boolean = false,
         val cards: List<Card> = listOf(),
         val selectedCardId: String = String.empty(),
-        val subtypes: List<Subtype> = listOf()
+        val subtypes: List<Subtype> = listOf(),
+        val sets: List<Set> = listOf()
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -38,9 +42,11 @@ class CardSearchViewModel : ViewModel() {
 
     private val cardUseCase = CardUseCase(CardRepositoryImpl())
     private val subtypeUseCase = SubtypeUseCase(SubtypeRepositoryImpl())
+    private val setUseCase = SetUseCase(SetRepositoryImpl())
 
     init {
         fetchLocalSubtypes()
+        fetchLocalSets()
     }
 
     fun searchCard(name: String) {
@@ -70,6 +76,17 @@ class CardSearchViewModel : ViewModel() {
         viewModelScope.launch {
             subtypeUseCase.fetchLocalSubtypes().collect {
                 _viewState.value = _viewState.value.copy(subtypes = it)
+                modifyLoadingVisibility(isLoading = false)
+            }
+        }
+    }
+
+    private fun fetchLocalSets() {
+        modifyLoadingVisibility(isLoading = true)
+
+        viewModelScope.launch {
+            setUseCase.fetchLocalSets().collect {
+                _viewState.value = _viewState.value.copy(sets = it)
                 modifyLoadingVisibility(isLoading = false)
             }
         }

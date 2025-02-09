@@ -16,6 +16,7 @@ object Dimensions {
     val ListItemInfoLeftPadding = 8.dp
     val ListFabPadding = 24.dp
     val ListItemDetailsBottomPadding = 24.dp
+    val FilterWindowOutterPadding = 12.dp
     val FilterWindowInnerPadding = 24.dp
     val FilterWindowTitleBottomPadding = 24.dp
     val FilterWindowCategoryEndPadding = 12.dp
