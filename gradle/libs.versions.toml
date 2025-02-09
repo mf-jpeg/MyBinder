@@ -20,6 +20,7 @@ coil-compose = "3.1.0"
 coil-network = "3.1.0"
 material-icons = "1.7.7"
 room = "2.6.1"
+work = "2.10.0"
 
 [libraries]
 # Default
@@ -48,6 +49,7 @@ coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = 
 material-icons-ext = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+work = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
 [plugins]
 # Default

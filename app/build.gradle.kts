@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.coil.network)
     implementation(libs.material.icons.ext)
     implementation(libs.room.ktx)
+    implementation(libs.work)
     //noinspection KaptUsageInsteadOfKsp
     kapt(libs.room.compiler)
 }

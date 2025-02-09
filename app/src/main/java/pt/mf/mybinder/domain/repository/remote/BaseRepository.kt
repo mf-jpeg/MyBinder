@@ -1,4 +1,4 @@
-package pt.mf.mybinder.domain.repository
+package pt.mf.mybinder.domain.repository.remote
 
 import okio.IOException
 import pt.mf.mybinder.utils.Result

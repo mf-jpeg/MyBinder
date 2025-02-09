@@ -1,8 +1,8 @@
-package pt.mf.mybinder.domain.usecase
+package pt.mf.mybinder.domain.usecase.remote
 
-import pt.mf.mybinder.data.model.CardDetailsResponse
-import pt.mf.mybinder.data.model.CardSearchResponse
-import pt.mf.mybinder.domain.repository.CardRepository
+import pt.mf.mybinder.data.model.remote.CardDetailsResponse
+import pt.mf.mybinder.data.model.remote.CardSearchResponse
+import pt.mf.mybinder.domain.repository.remote.CardRepository
 import pt.mf.mybinder.utils.Result
 
 /**

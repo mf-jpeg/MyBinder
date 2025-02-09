@@ -1,7 +1,9 @@
 package pt.mf.mybinder.data.remote
 
-import pt.mf.mybinder.data.model.CardDetailsResponse
-import pt.mf.mybinder.data.model.CardSearchResponse
+import pt.mf.mybinder.data.model.remote.CardDetailsResponse
+import pt.mf.mybinder.data.model.remote.CardSearchResponse
+import pt.mf.mybinder.data.model.remote.SetResponse
+import pt.mf.mybinder.data.model.remote.SubTypesResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -22,4 +24,10 @@ interface HttpApi {
     suspend fun fetchCardDetails(
         @Path("id") id: String
     ): Response<CardDetailsResponse>
+
+    @GET("sets")
+    suspend fun fetchSets(): Response<SetResponse>
+
+    @GET("subtypes")
+    suspend fun fetchSubTypes(): Response<SubTypesResponse>
 }

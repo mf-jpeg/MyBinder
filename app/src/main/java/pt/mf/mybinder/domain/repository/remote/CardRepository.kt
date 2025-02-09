@@ -1,7 +1,7 @@
-package pt.mf.mybinder.domain.repository
+package pt.mf.mybinder.domain.repository.remote
 
-import pt.mf.mybinder.data.model.CardDetailsResponse
-import pt.mf.mybinder.data.model.CardSearchResponse
+import pt.mf.mybinder.data.model.remote.CardDetailsResponse
+import pt.mf.mybinder.data.model.remote.CardSearchResponse
 import pt.mf.mybinder.utils.Result
 
 /**
