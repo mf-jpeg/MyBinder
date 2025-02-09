@@ -119,6 +119,8 @@ fun CardSearchScreen(padding: PaddingValues) {
             SearchBar(viewState, viewModel)
 
             Box {
+                NothingToDisplayYet(viewState)
+                NoResultsFound(viewState)
                 ResultList(listState, viewState, viewModel)
                 FilterWindow(viewState, viewModel)
             }
@@ -149,6 +151,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                     Utils.tactileFeedback()
                     keyboardController?.hide()
                     focusManager.clearFocus()
+                    viewModel.modifyisNothingToDisplay(false)
                     viewModel.modifyFilterWindowVisibility(!viewState.isFilterWindowVisible)
                 }
             ) {
@@ -511,6 +514,34 @@ fun FilterOrderBy(
             )
         }
     }
+}
+
+@Composable
+fun NothingToDisplayYet(viewState: CardSearchViewState) {
+    if (!viewState.isNothingToDisplay)
+        return
+
+    Text(
+        text = Utils.getString(R.string.card_search_filter_order_nothing_yet),
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize()
+    )
+}
+
+@Composable
+fun NoResultsFound(viewState: CardSearchViewState) {
+    if (!viewState.isNoResultsFound)
+        return
+
+    Text(
+        text = Utils.getString(R.string.card_search_filter_order_nothing_no_results),
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize()
+    )
 }
 
 @Composable

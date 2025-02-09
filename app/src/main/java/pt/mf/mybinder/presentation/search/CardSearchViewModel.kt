@@ -38,7 +38,9 @@ class CardSearchViewModel : ViewModel() {
         val selectedCardId: String = String.empty(),
         val subtypes: List<Subtype> = listOf(),
         val sets: List<Set> = listOf(),
-        val selectOrderIndex: Int = 0
+        val selectedOrderIndex: Int = 0,
+        val isNothingToDisplay: Boolean = true,
+        val isNoResultsFound: Boolean = false
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -131,6 +133,10 @@ class CardSearchViewModel : ViewModel() {
     }
 
     fun modifySelectedOrderIndex(index: Int) {
-        _viewState.value = _viewState.value.copy(selectOrderIndex = index)
+        _viewState.value = _viewState.value.copy(selectedOrderIndex = index)
+    }
+
+    fun modifyisNothingToDisplay(isNothingToDisplay: Boolean) {
+        _viewState.value = _viewState.value.copy(isNothingToDisplay = isNothingToDisplay)
     }
 }

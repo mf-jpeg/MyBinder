@@ -21,4 +21,6 @@
     <string name="card_search_filter_order_alpha">Alpha</string>
     <string name="card_search_filter_order_chrono">Chrono</string>
     <string name="card_search_filter_filter_not_ready">Search filter will be available shortly.</string>
+    <string name="card_search_filter_order_nothing_yet">Nothing to display just yet.</string>
+    <string name="card_search_filter_order_nothing_no_results">No results found.</string>
 </resources>
