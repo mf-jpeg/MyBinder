@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import pt.mf.mybinder.data.repository.remote.CardRepositoryImpl
+import pt.mf.mybinder.data.repository.CardRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
-import pt.mf.mybinder.domain.usecase.remote.CardUseCase
+import pt.mf.mybinder.domain.usecase.CardUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils

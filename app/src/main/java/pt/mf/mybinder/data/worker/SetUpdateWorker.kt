@@ -5,8 +5,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pt.mf.mybinder.data.repository.remote.SetRepositoryImpl
-import pt.mf.mybinder.domain.usecase.remote.SetUseCase
+import pt.mf.mybinder.data.model.local.Set
+import pt.mf.mybinder.data.repository.SetRepositoryImpl
+import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.utils.Logger
 
 /**
@@ -22,13 +23,22 @@ class SetUpdateWorker(
     }
 
     override suspend fun doWork(): Result {
+        val useCase = SetUseCase(SetRepositoryImpl())
+
         val result = withContext(Dispatchers.IO) {
             Logger.debug(TAG, "Running periodic $TAG routine.")
-            SetUseCase(SetRepositoryImpl()).fetchSets()
+            useCase.remoteFetchSets()
         }
 
         return when (result) {
             is pt.mf.mybinder.utils.Result.Success -> {
+                val sets = mutableListOf<Set>()
+
+                result.data.data.forEach {
+                    sets.add(useCase.convertRemoteToLocalSet(it))
+                }
+
+                useCase.insertSets(sets)
                 Logger.debug(TAG, "Updated sets successfully.")
                 Result.success()
             }

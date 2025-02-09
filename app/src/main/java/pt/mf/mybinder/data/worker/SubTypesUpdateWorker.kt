@@ -5,9 +5,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pt.mf.mybinder.data.repository.remote.SubTypesRepositoryImpl
-import pt.mf.mybinder.domain.repository.remote.SubTypesRepository
-import pt.mf.mybinder.domain.usecase.remote.SubTypesUseCase
+import pt.mf.mybinder.data.model.local.SubType
+import pt.mf.mybinder.data.repository.SubTypesRepositoryImpl
+import pt.mf.mybinder.domain.usecase.SubTypesUseCase
 import pt.mf.mybinder.utils.Logger
 
 /**
@@ -23,13 +23,22 @@ class SubTypesUpdateWorker(
     }
 
     override suspend fun doWork(): Result {
+        val useCase = SubTypesUseCase(SubTypesRepositoryImpl())
+
         val result = withContext(Dispatchers.IO) {
             Logger.debug(TAG, "Running periodic $TAG routine.")
-            SubTypesUseCase(SubTypesRepositoryImpl()).fetchSubTypes()
+            useCase.remoteFetchSubTypes()
         }
 
         return when (result) {
             is pt.mf.mybinder.utils.Result.Success -> {
+                val subtypes = mutableListOf<SubType>()
+
+                result.data.data.forEach {
+                    subtypes.add(useCase.convertRemoteToLocalSubType(it))
+                }
+
+                useCase.insertSubTypes(subtypes)
                 Logger.debug(TAG, "Updated subtypes successfully.")
                 Result.success()
             }
