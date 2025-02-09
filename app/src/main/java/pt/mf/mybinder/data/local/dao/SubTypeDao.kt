@@ -1,6 +1,8 @@
 package pt.mf.mybinder.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -11,10 +13,10 @@ import pt.mf.mybinder.data.model.local.Subtype
  */
 @Dao
 interface SubtypeDao {
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertSubType(subtype: Subtype)
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertSubTypes(subtypes: List<Subtype>)
 
     @Query("SELECT * FROM Subtype ORDER BY name ASC")
