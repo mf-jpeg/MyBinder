@@ -25,7 +25,7 @@ class CardSearchViewModel : ViewModel() {
     data class CardSearchViewState(
         val isLoading: Boolean = false,
         val cards: List<Card> = listOf(),
-        val clickedCardId: String = String.empty()
+        val selectedCardId: String = String.empty()
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -41,14 +41,12 @@ class CardSearchViewModel : ViewModel() {
 
             when (val result = cardUseCase.searchCard(name)) {
                 is Result.Success -> {
-                    Logger.debug(TAG, "Request success!")
                     Utils.tactileFeedback()
                     populateCardList(result.data.data)
                     modifyLoadingState(isLoading = false)
                 }
 
                 is Result.Error -> {
-                    Logger.error(TAG, "Request error! ${result.exception.message}")
                     Utils.tactileFeedback()
                     modifyLoadingState(isLoading = false)
                 }
@@ -68,11 +66,11 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(cards = listOf())
     }
 
-    fun modifyClickedCardId(id: String) {
-        _viewState.value = _viewState.value.copy(clickedCardId = id)
+    fun modifySelectedCardId(id: String) {
+        _viewState.value = _viewState.value.copy(selectedCardId = id)
     }
 
     fun clearClickedCardId() {
-        _viewState.value = _viewState.value.copy(clickedCardId = String.empty())
+        _viewState.value = _viewState.value.copy(selectedCardId = String.empty())
     }
 }
