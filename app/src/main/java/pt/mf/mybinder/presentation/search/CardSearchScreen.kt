@@ -79,6 +79,8 @@ import pt.mf.mybinder.utils.Dimensions.FilterWindowDropdownCornerRadius
 import pt.mf.mybinder.utils.Dimensions.FilterWindowElevation
 import pt.mf.mybinder.utils.Dimensions.FilterWindowInnerPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowOutterPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowRadioTitleEndPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowRadioTitleStartPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowTitleBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListFabPadding
 import pt.mf.mybinder.utils.Dimensions.ListHorizontalPadding
@@ -493,26 +495,37 @@ fun FilterOrderBy(
 ) {
     var selectedOption by remember { mutableStateOf(options.first()) }
 
-    Row(modifier = modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth()
+    ) {
         options.forEach { option ->
-            RadioButton(
-                colors = RadioButtonDefaults.colors(
-                    selectedColor = Theme.getPrimary()
-                ),
-                selected = (option == selectedOption),
-                onClick = {
+            Row(
+                modifier = Modifier.clickable(onClick = {
                     selectedOption = option
                     Utils.tactileFeedback()
                     viewModel.modifySelectedOrderIndex(options.indexOf(selectedOption))
-                }
-            )
+                })
+            ) {
+                RadioButton(
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Theme.getPrimary(),
+                        disabledSelectedColor = Theme.getPrimary()
+                    ),
+                    selected = (option == selectedOption),
+                    onClick = null,
+                    enabled = false,
+                )
 
-            Text(
-                text = option,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(end = FilterWindowCategoryTitleEndPadding)
-            )
+                Text(
+                    text = option,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(
+                            start = FilterWindowRadioTitleStartPadding,
+                            end = FilterWindowRadioTitleEndPadding
+                        )
+                )
+            }
         }
     }
 }

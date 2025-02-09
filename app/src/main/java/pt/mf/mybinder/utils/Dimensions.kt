@@ -24,6 +24,8 @@ object Dimensions {
     val FilterWindowTitleBottomPadding = 24.dp
     val FilterWindowCategoryTitleEndPadding = 12.dp
     val FilterWindowApplyTopPadding = 24.dp
+    val FilterWindowRadioTitleStartPadding = 4.dp
+    val FilterWindowRadioTitleEndPadding = 12.dp
     val FilterWindowDropdownCornerRadius = 12.dp
-    val FilterWindowCategoryRowTopPadding = 4.dp
+    val FilterWindowCategoryRowTopPadding = 6.dp
 }
