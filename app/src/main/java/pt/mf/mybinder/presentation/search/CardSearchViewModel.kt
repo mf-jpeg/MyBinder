@@ -16,6 +16,9 @@ import pt.mf.mybinder.domain.usecase.CardUseCase
 import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
+import pt.mf.mybinder.utils.Preferences
+import pt.mf.mybinder.utils.Preferences.SETS_READY_KEY
+import pt.mf.mybinder.utils.Preferences.SUBTYPES_READY_KEY
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
 import pt.mf.mybinder.utils.Utils.empty
@@ -90,6 +93,11 @@ class CardSearchViewModel : ViewModel() {
                 modifyLoadingVisibility(isLoading = false)
             }
         }
+    }
+
+    fun isFilterReady(): Boolean {
+        return Preferences.getPref<Boolean>(SETS_READY_KEY) &&
+                Preferences.getPref<Boolean>(SUBTYPES_READY_KEY)
     }
 
     private fun modifyLoadingVisibility(isLoading: Boolean) {

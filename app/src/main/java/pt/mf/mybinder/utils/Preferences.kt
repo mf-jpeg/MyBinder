@@ -10,6 +10,9 @@ object Preferences {
     const val TAG = "Preferences"
     const val PREF_KEY = "preferences"
 
+    const val SETS_READY_KEY = "sets_ready"
+    const val SUBTYPES_READY_KEY = "subtypes_ready"
+
     @SuppressLint("ApplySharedPref")
     fun <T> setPref(key: String, value: T) {
         val sp =

@@ -16,4 +16,5 @@
     <string name="card_search_filter_title">Filters</string>
     <string name="card_search_filter_subtype">Type</string>
     <string name="card_search_filter_set">Set</string>
+    <string name="card_search_filter_filter_not_ready">Filter will be available in a moment.</string>
 </resources>

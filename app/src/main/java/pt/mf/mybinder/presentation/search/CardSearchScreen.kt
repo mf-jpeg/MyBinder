@@ -113,7 +113,7 @@ fun CardSearchScreen(padding: PaddingValues) {
             SearchBar(viewState, viewModel)
             Box {
                 ResultList(listState, viewState, viewModel)
-                FilterWindow(viewState)
+                FilterWindow(viewState, viewModel)
             }
         }
         ListItemDetails(viewState, viewModel, bottomSheetState)
@@ -324,9 +324,14 @@ fun ListFloatingActionButton(listState: LazyListState, coroutineScope: Coroutine
 }
 
 @Composable
-fun FilterWindow(viewState: CardSearchViewState) {
-    if (!viewState.isFilterWindowVisible)
+fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
+    if (!viewState.isFilterWindowVisible) {
         return
+    } else if (!viewModel.isFilterReady()) {
+        viewModel.modifyFilterWindowVisibility(isVisibile = false)
+        Utils.toast(Utils.getString(R.string.card_search_filter_filter_not_ready))
+        return
+    }
 
     ElevatedCard(
         modifier = Modifier
@@ -378,14 +383,14 @@ fun FilterWindow(viewState: CardSearchViewState) {
 @Composable
 fun FilterList(options: List<String>) {
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options.first()) }
+    var selectedOption by remember { mutableStateOf(options.firstOrNull()) }
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
         onExpandedChange = { isExpanded = it }
     ) {
         OutlinedTextField(
-            value = selectedOption,
+            value = selectedOption ?: String.empty(),
             onValueChange = {},
             readOnly = true,
             modifier = Modifier.menuAnchor(PrimaryNotEditable, true),

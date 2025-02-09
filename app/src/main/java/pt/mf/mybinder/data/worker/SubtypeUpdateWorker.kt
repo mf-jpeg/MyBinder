@@ -9,6 +9,7 @@ import pt.mf.mybinder.data.model.local.Subtype
 import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
+import pt.mf.mybinder.utils.Preferences
 
 /**
  * Created by Martim Ferreira on 09/02/2025
@@ -39,6 +40,10 @@ class SubtypeUpdateWorker(
                 }
 
                 useCase.insertSubTypes(subtypes)
+
+                if (subtypes.isNotEmpty())
+                    Preferences.setPref(Preferences.SUBTYPES_READY_KEY, true)
+
                 Logger.debug(TAG, "Updated subtypes successfully.")
                 Result.success()
             }

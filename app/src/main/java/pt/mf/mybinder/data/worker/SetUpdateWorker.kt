@@ -9,6 +9,7 @@ import pt.mf.mybinder.data.model.local.Set
 import pt.mf.mybinder.data.repository.SetRepositoryImpl
 import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.utils.Logger
+import pt.mf.mybinder.utils.Preferences
 
 /**
  * Created by Martim Ferreira on 09/02/2025
@@ -39,6 +40,10 @@ class SetUpdateWorker(
                 }
 
                 useCase.insertSets(sets)
+
+                if (sets.isNotEmpty())
+                    Preferences.setPref(Preferences.SETS_READY_KEY, true)
+
                 Logger.debug(TAG, "Updated sets successfully.")
                 Result.success()
             }

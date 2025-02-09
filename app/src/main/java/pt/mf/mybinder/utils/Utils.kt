@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.widget.Toast
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -47,5 +48,9 @@ object Utils {
 
     fun formatPrice(price: Float?): String {
         return if (price != null) "Low: $price€" else "Low: N/A"
+    }
+
+    fun toast(message: String) {
+        Toast.makeText(MyBinder.ctx, message, Toast.LENGTH_SHORT).show()
     }
 }
