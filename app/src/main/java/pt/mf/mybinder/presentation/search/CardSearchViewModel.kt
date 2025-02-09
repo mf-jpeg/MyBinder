@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import pt.mf.mybinder.data.repository.CardRepositoryImpl
 import pt.mf.mybinder.domain.model.Card
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
+import pt.mf.mybinder.utils.Utils.empty
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -22,7 +24,8 @@ class CardSearchViewModel : ViewModel() {
 
     data class CardSearchViewState(
         val isLoading: Boolean = false,
-        val cards: List<Card> = listOf()
+        val cards: List<Card> = listOf(),
+        val clickedCardId: String = String.empty()
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -63,5 +66,13 @@ class CardSearchViewModel : ViewModel() {
 
     fun clearCardList() {
         _viewState.value = _viewState.value.copy(cards = listOf())
+    }
+
+    fun modifyClickedCardId(id: String) {
+        _viewState.value = _viewState.value.copy(clickedCardId = id)
+    }
+
+    fun clearClickedCardId() {
+        _viewState.value = _viewState.value.copy(clickedCardId = String.empty())
     }
 }

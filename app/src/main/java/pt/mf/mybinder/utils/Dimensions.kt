@@ -15,4 +15,5 @@ object Dimensions {
     val ListItemInnerPadding = 8.dp
     val ListItemInfoLeftPadding = 8.dp
     val ListFabPadding = 24.dp
+    val ListItemDetailsBottomPadding = 24.dp
 }

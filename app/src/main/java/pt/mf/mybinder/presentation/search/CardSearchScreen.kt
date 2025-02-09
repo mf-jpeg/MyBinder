@@ -1,6 +1,7 @@
 package pt.mf.mybinder.presentation.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,11 +24,15 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -55,16 +60,19 @@ import kotlinx.coroutines.launch
 import pt.mf.mybinder.R
 import pt.mf.mybinder.domain.model.Card
 import pt.mf.mybinder.presentation.search.CardSearchViewModel.CardSearchViewState
+import pt.mf.mybinder.presentation.search.HOLDER.TAG
 import pt.mf.mybinder.presentation.theme.LoadingBackground
 import pt.mf.mybinder.presentation.theme.Theme
 import pt.mf.mybinder.utils.Dimensions.ListFabPadding
 import pt.mf.mybinder.utils.Dimensions.ListHorizontalPadding
 import pt.mf.mybinder.utils.Dimensions.ListItemCornerRadius
+import pt.mf.mybinder.utils.Dimensions.ListItemDetailsBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListItemElevation
 import pt.mf.mybinder.utils.Dimensions.ListItemInfoLeftPadding
 import pt.mf.mybinder.utils.Dimensions.ListItemInnerPadding
 import pt.mf.mybinder.utils.Dimensions.ListItemOuterBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListTopPadding
+import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Utils
 import pt.mf.mybinder.utils.Utils.empty
 
@@ -75,11 +83,15 @@ object HOLDER {
     const val TAG = "CardSearchScreen"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardSearchScreen(padding: PaddingValues) {
     val viewModel: CardSearchViewModel = viewModel()
+
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     val coroutineScope = rememberCoroutineScope()
 
     Box(
@@ -89,9 +101,10 @@ fun CardSearchScreen(padding: PaddingValues) {
     ) {
         Column {
             SearchBar(viewModel)
-            ResultList(listState, viewState)
+            ResultList(listState, viewState, viewModel)
         }
         ListFloatingActionButton(listState, coroutineScope)
+        ListItemDetails(viewState, viewModel, bottomSheetState)
         LoadingOverlay(viewState.isLoading)
     }
 }
@@ -142,7 +155,11 @@ fun SearchBar(viewModel: CardSearchViewModel) {
 }
 
 @Composable
-fun ResultList(listState: LazyListState, viewState: CardSearchViewState) {
+fun ResultList(
+    listState: LazyListState,
+    viewState: CardSearchViewState,
+    viewModel: CardSearchViewModel
+) {
     LazyColumn(
         state = listState,
         modifier = Modifier
@@ -151,13 +168,13 @@ fun ResultList(listState: LazyListState, viewState: CardSearchViewState) {
             .padding(horizontal = ListHorizontalPadding)
     ) {
         items(viewState.cards) { card ->
-            ListItem(card)
+            ListItem(card, viewModel)
         }
     }
 }
 
 @Composable
-fun ListItem(card: Card) {
+fun ListItem(card: Card, viewModel: CardSearchViewModel) {
     var imageLoaded by remember { mutableStateOf(false) }
 
     ElevatedCard(
@@ -166,6 +183,10 @@ fun ListItem(card: Card) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = ListItemOuterBottomPadding)
+            .clickable {
+                Logger.debug(TAG, "Selected card with id \"${card.id}\"")
+                viewModel.modifyClickedCardId(card.id)
+            }
     ) {
         Row(
             modifier = Modifier
@@ -198,6 +219,54 @@ fun ListItem(card: Card) {
                 Text(text = card.set.name)
                 Text(text = Utils.formatPrice(card.cardMarket?.prices?.lowPrice))
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListItemDetails(
+    viewState: CardSearchViewState,
+    viewModel: CardSearchViewModel,
+    bottomSheetState: SheetState
+) {
+    val card = viewState.cards.find { it.id == viewState.clickedCardId }
+    var imageLoaded by remember { mutableStateOf(false) }
+
+    if (card == null)
+        return
+
+    Logger.debug(TAG, "Opened ModalBottomSheet for card with id \"${card.id}\".")
+
+    ModalBottomSheet(
+        sheetState = bottomSheetState,
+        onDismissRequest = {
+            Logger.debug(TAG, "Closed ModalBottomSheet.")
+            viewModel.clearClickedCardId()
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center)
+                .padding(bottom = ListItemDetailsBottomPadding)
+        ) {
+            if (!imageLoaded)
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentSize(align = Alignment.Center)
+                )
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(card.images.large)
+                    .crossfade(750)
+                    .build(),
+                contentDescription = null,
+                onSuccess = { imageLoaded = true },
+                onError = { imageLoaded = false }
+            )
         }
     }
 }
