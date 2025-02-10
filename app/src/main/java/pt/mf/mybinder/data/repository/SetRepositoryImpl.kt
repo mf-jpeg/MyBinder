@@ -34,4 +34,8 @@ class SetRepositoryImpl() : SetRepository {
     override suspend fun fetchLocalSetById(id: String): Flow<Set?> {
         return dao.getById(id)
     }
+
+    override suspend fun fetchLocalSetIdByName(name: String): Flow<String?> {
+        return dao.getIdByName(name)
+    }
 }

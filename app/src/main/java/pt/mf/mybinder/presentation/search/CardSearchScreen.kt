@@ -195,8 +195,9 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                 viewModel.clearCardList()
                 keyboardController?.hide()
                 focusManager.clearFocus()
-                viewModel.changeIsNothingToDisplay(false)
-                viewModel.searchCard(query.trim())
+                viewModel.changeIsNothingToDisplayVisibility(false)
+                viewModel.changeNoResultsFoundVisibility(false)
+                viewModel.fetchCards(query.trim())
             }
         ),
         modifier = Modifier
@@ -391,6 +392,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         viewState.subtypes.map { it.name },
                         viewModel::getSelectedSubtype,
                         viewModel::setSelectedSubtype,
+                        viewModel::setSubtypeFilterEnabled
                     )
 
                     Row(
@@ -428,6 +430,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         viewState.sets.map { it.name },
                         viewModel::getSelectedSet,
                         viewModel::setSelectedSet,
+                        viewModel::setSetFilterEnabled
                     )
 
                     Row(
@@ -520,6 +523,7 @@ fun FilterDropdown(
     options: List<String>,
     getSelectedOption: () -> String,
     setSelectedOption: (String) -> Unit,
+    setRadioToSpecific: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -553,6 +557,7 @@ fun FilterDropdown(
                     text = { Text(text = option) },
                     onClick = {
                         setSelectedOption.invoke(option)
+                        setRadioToSpecific(1)
                         isExpanded = false
                         Utils.tactileFeedback()
                     }

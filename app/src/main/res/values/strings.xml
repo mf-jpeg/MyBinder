@@ -13,7 +13,7 @@
     <string name="top_bar_settings">Settings</string>
 
     <!-- Card Search -->
-    <string name="card_search_placeholder">Type card name</string>
+    <string name="card_search_placeholder">Type name (blank for all cards)</string>
     <string name="card_search_filter_title">Filters</string>
     <string name="card_search_filter_all">All</string>
     <string name="card_search_filter_specific">Specific</string>

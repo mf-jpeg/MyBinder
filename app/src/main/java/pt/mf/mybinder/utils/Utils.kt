@@ -57,4 +57,8 @@ object Utils {
     fun toast(message: String) {
         Toast.makeText(MyBinder.ctx, message, Toast.LENGTH_SHORT).show()
     }
+
+    fun convertIntToBoolean(value: Int): Boolean {
+        return value == 1
+    }
 }

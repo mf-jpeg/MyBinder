@@ -5,6 +5,6 @@ import pt.mf.mybinder.domain.model.remote.Card
 /**
  * Created by Martim Ferreira on 08/02/2025
  */
-data class CardDetailsResponse(
+data class CardResponse(
     val data: Card
 )

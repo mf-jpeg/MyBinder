@@ -5,10 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import pt.mf.mybinder.data.model.local.Set
 import pt.mf.mybinder.data.model.local.Subtype
-import pt.mf.mybinder.data.repository.CardRepositoryImpl
+import pt.mf.mybinder.data.repository.SearchRepositoryImpl
 import pt.mf.mybinder.data.repository.SetRepositoryImpl
 import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
@@ -55,7 +56,7 @@ class CardSearchViewModel : ViewModel() {
     private val _viewState = MutableStateFlow(CardSearchViewState())
     val viewState = _viewState.asStateFlow()
 
-    private val searchUseCase = SearchUseCase(CardRepositoryImpl())
+    private val searchUseCase = SearchUseCase(SearchRepositoryImpl())
     private val subtypeUseCase = SubtypeUseCase(SubtypeRepositoryImpl())
     private val setUseCase = SetUseCase(SetRepositoryImpl())
 
@@ -64,21 +65,39 @@ class CardSearchViewModel : ViewModel() {
         fetchLocalSets()
     }
 
-    fun searchCard(name: String) {
+    fun fetchCards(name: String) {
         Logger.debug(TAG, "Searching for card with title \"$name\".")
 
         viewModelScope.launch(Dispatchers.IO) {
             setLoadingVisibility(isLoading = true)
+            recallSelectedFilters()
 
-            when (val result = searchUseCase.searchCard(name)) {
+            val setId =
+                setUseCase.fetchLocalSetIdByName(getPref(SEARCH_SET_KEY)).firstOrNull()
+
+            val result = searchUseCase.fetchCards(
+                name,
+                getPref(SEARCH_SUBTYPE_KEY),
+                setId.orEmpty(),
+                Utils.convertIntToBoolean(_viewState.value.isSubtypeFilterEnabled),
+                Utils.convertIntToBoolean(_viewState.value.isSetFilterEnabled)
+            )
+
+            when (result) {
                 is Result.Success -> {
                     Utils.tactileFeedback()
-                    populateCardList(result.data.data)
+
+                    if (result.data.data.isNotEmpty())
+                        populateCardList(result.data.data)
+                    else
+                        changeNoResultsFoundVisibility(isNoResultsFound = true)
+
                     setLoadingVisibility(isLoading = false)
                 }
 
                 is Result.Error -> {
                     Utils.tactileFeedback()
+                    changeNoResultsFoundVisibility(isNoResultsFound = true)
                     setLoadingVisibility(isLoading = false)
                 }
             }
@@ -146,8 +165,12 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(selectedCardId = String.empty())
     }
 
-    fun changeIsNothingToDisplay(isNothingToDisplay: Boolean) {
+    fun changeIsNothingToDisplayVisibility(isNothingToDisplay: Boolean) {
         _viewState.value = _viewState.value.copy(isNothingToDisplay = isNothingToDisplay)
+    }
+
+    fun changeNoResultsFoundVisibility(isNoResultsFound: Boolean) {
+        _viewState.value = _viewState.value.copy(isNoResultsFound = isNoResultsFound)
     }
 
     fun getSelectedSubtype(): String {

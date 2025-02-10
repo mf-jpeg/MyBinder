@@ -1,8 +1,9 @@
 package pt.mf.mybinder.domain.usecase
 
-import pt.mf.mybinder.data.model.remote.CardDetailsResponse
-import pt.mf.mybinder.data.model.remote.CardSearchResponse
-import pt.mf.mybinder.domain.repository.CardRepository
+import pt.mf.mybinder.data.model.remote.CardResponse
+import pt.mf.mybinder.data.model.remote.SearchResponse
+import pt.mf.mybinder.domain.repository.SearchRepository
+import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_ORDER_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_ACTIVE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_KEY
@@ -14,28 +15,64 @@ import pt.mf.mybinder.utils.Result
 /**
  * Created by Martim Ferreira on 10/02/2025
  */
-class SearchUseCase(private val repository: CardRepository) : BaseUseCase() {
+class SearchUseCase(
+    private val repository: SearchRepository
+) : BaseUseCase() {
+
     private companion object {
+        const val TAG = "SearchUseCase"
         const val DEFAULT_PAGE_SIZE = 10
         const val DEFAULT_PAGE_NUMBER = 1
     }
 
-    suspend fun searchCard(
+    suspend fun fetchCards(
         name: String,
+        subtype: String,
+        setId: String,
+        isSubtypeFilterEnabled: Boolean,
+        isSetFilterEnabled: Boolean,
         pageSize: Int = DEFAULT_PAGE_SIZE,
         pageNumber: Int = DEFAULT_PAGE_NUMBER,
-    ): Result<CardSearchResponse> {
+    ): Result<SearchResponse> {
         return performHttpRequest {
-            repository.searchCard(name, pageSize, pageNumber)
+            repository.fetchCards(
+                formatQuery(name, subtype, setId, isSubtypeFilterEnabled, isSetFilterEnabled),
+                pageSize,
+                pageNumber
+            )
         }
     }
 
-    suspend fun fetchCardDetails(
-        id: String
-    ): Result<CardDetailsResponse> {
+    suspend fun fetchCard(id: String): Result<CardResponse> {
         return performHttpRequest {
-            repository.fetchCardDetails(id)
+            repository.fetchCard(id)
         }
+    }
+
+    private fun formatQuery(
+        name: String,
+        subtype: String,
+        setId: String,
+        isSubtypeFilterEnabled: Boolean,
+        isSetFilterEnabled: Boolean,
+    ): String {
+        val sb = StringBuilder()
+
+        if (name.isNotEmpty())
+            sb.append("name:$name ")
+
+        if (isSubtypeFilterEnabled) {
+            if (subtype.isNotEmpty())
+                sb.append("subtypes:$subtype ")
+        }
+
+        if (isSetFilterEnabled) {
+            if (setId.isNotEmpty())
+                sb.append("set.id:$setId ")
+        }
+
+        Logger.debug(TAG, "Formatted query: \"${sb.trim()}\".")
+        return sb.toString().trim()
     }
 
     fun applyFilters(
