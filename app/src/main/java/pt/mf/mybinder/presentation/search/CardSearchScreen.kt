@@ -153,7 +153,17 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                     Utils.tactileFeedback()
                     keyboardController?.hide()
                     focusManager.clearFocus()
-                    viewModel.modifyFilterWindowVisibility(!viewState.isFilterWindowVisible)
+
+                    if (!viewModel.isFilterReady()) {
+                        viewModel.setFilterWindowVisibility(isVisibile = false)
+                        Utils.toast(Utils.getString(R.string.card_search_filter_filter_not_ready))
+                        return@IconButton
+                    }
+
+                    if (!viewState.isFilterWindowVisible)
+                        viewModel.recallSelectedFilters()
+
+                    viewModel.setFilterWindowVisibility(!viewState.isFilterWindowVisible)
                 }
             ) {
                 Icon(imageVector = Icons.Default.FilterList, contentDescription = null)
@@ -182,7 +192,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                 viewModel.clearCardList()
                 keyboardController?.hide()
                 focusManager.clearFocus()
-                viewModel.modifyisNothingToDisplay(false)
+                viewModel.changeIsNothingToDisplay(false)
                 viewModel.searchCard(query.trim())
             }
         ),
@@ -190,7 +200,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
             .fillMaxWidth()
             .focusRequester(focusRequester)
             .onFocusChanged {
-                viewModel.modifyFilterWindowVisibility(isVisibile = false)
+                viewModel.setFilterWindowVisibility(isVisibile = false)
             }
     )
 }
@@ -226,8 +236,8 @@ fun ListItem(card: Card, viewModel: CardSearchViewModel) {
             .padding(bottom = ListItemOuterBottomPadding)
             .clickable {
                 Logger.debug(TAG, "Tapped card with id \"${card.id}\"")
-                viewModel.modifyFilterWindowVisibility(isVisibile = false)
-                viewModel.modifySelectedCardId(card.id)
+                viewModel.setFilterWindowVisibility(isVisibile = false)
+                viewModel.setSelectedCardId(card.id)
             }
     ) {
         Row(
@@ -259,7 +269,7 @@ fun ListItem(card: Card, viewModel: CardSearchViewModel) {
                 Text(text = card.name)
                 Text(text = card.superType)
                 Text(text = card.set.name)
-                Text(text = Utils.formatPrice(card.cardMarket?.prices?.lowPrice))
+                Text(text = viewModel.formatPrice(card.cardMarket?.prices?.lowPrice))
             }
         }
     }
@@ -345,13 +355,8 @@ fun ListFloatingActionButton(listState: LazyListState, coroutineScope: Coroutine
 
 @Composable
 fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
-    if (!viewState.isFilterWindowVisible) {
+    if (!viewState.isFilterWindowVisible)
         return
-    } else if (!viewModel.isFilterReady()) {
-        viewModel.modifyFilterWindowVisibility(isVisibile = false)
-        Utils.toast(Utils.getString(R.string.card_search_filter_filter_not_ready))
-        return
-    }
 
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(FilterWindowElevation),
@@ -376,7 +381,13 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         .padding(end = FilterWindowCategoryTitleEndPadding)
                         .weight(1f)
                 )
-                FilterDropdown(viewState.subtypes.map { it.name }, Modifier.weight(4f))
+
+                FilterDropdown(
+                    viewState.subtypes.map { it.name },
+                    viewModel::getSelectedSubtype,
+                    viewModel::setSelectedSubtype,
+                    Modifier.weight(4f)
+                )
             }
 
             Row(
@@ -389,7 +400,12 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         .padding(end = FilterWindowCategoryTitleEndPadding)
                         .weight(1f)
                 )
-                FilterDropdown(viewState.sets.map { it.name }, Modifier.weight(4f))
+                FilterDropdown(
+                    viewState.sets.map { it.name },
+                    viewModel::getSelectedSet,
+                    viewModel::setSelectedSet,
+                    Modifier.weight(4f)
+                )
             }
 
             Row(
@@ -408,7 +424,8 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         Utils.getString(R.string.card_search_filter_order_alpha),
                         Utils.getString(R.string.card_search_filter_order_chrono)
                     ),
-                    viewModel,
+                    viewModel::getSelectedOrder,
+                    viewModel::setSelectedOrder,
                     modifier = Modifier.weight(4f)
                 )
             }
@@ -425,7 +442,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            viewModel.modifyFilterWindowVisibility(isVisibile = false)
+                            viewModel.setFilterWindowVisibility(isVisibile = false)
                             Utils.tactileFeedback()
                         }
                 )
@@ -437,7 +454,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                     modifier = Modifier
                         .weight(1f)
                         .clickable {
-                            viewModel.modifyFilterWindowVisibility(isVisibile = false)
+                            viewModel.setFilterWindowVisibility(isVisibile = false)
                             Utils.tactileFeedback()
                             viewModel.applyFilters()
                         }
@@ -449,9 +466,13 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
+fun FilterDropdown(
+    options: List<String>,
+    getSelectedOption: () -> String,
+    setSelectedOption: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options.firstOrNull()) }
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
@@ -459,7 +480,7 @@ fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         TextField(
-            value = selectedOption ?: String.empty(),
+            value = getSelectedOption.invoke(),
             onValueChange = {},
             readOnly = true,
             shape = RoundedCornerShape(FilterWindowDropdownCornerRadius),
@@ -478,7 +499,7 @@ fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
                 DropdownMenuItem(
                     text = { Text(text = option) },
                     onClick = {
-                        selectedOption = option
+                        setSelectedOption.invoke(option)
                         isExpanded = false
                     }
                 )
@@ -490,20 +511,18 @@ fun FilterDropdown(options: List<String>, modifier: Modifier = Modifier) {
 @Composable
 fun FilterOrderBy(
     options: List<String>,
-    viewModel: CardSearchViewModel,
+    getSelectedOption: () -> Int,
+    setSelectedOption: (Int) -> Unit,
     modifier: Modifier
 ) {
-    var selectedOption by remember { mutableStateOf(options.first()) }
-
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
         options.forEach { option ->
             Row(
                 modifier = Modifier.clickable(onClick = {
-                    selectedOption = option
                     Utils.tactileFeedback()
-                    viewModel.modifySelectedOrderIndex(options.indexOf(selectedOption))
+                    setSelectedOption.invoke(options.indexOf(option))
                 })
             ) {
                 RadioButton(
@@ -511,7 +530,7 @@ fun FilterOrderBy(
                         selectedColor = Theme.getPrimary(),
                         disabledSelectedColor = Theme.getPrimary()
                     ),
-                    selected = (option == selectedOption),
+                    selected = (options.indexOf(option) == getSelectedOption.invoke()),
                     onClick = null,
                     enabled = false,
                 )

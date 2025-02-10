@@ -13,12 +13,16 @@ import pt.mf.mybinder.data.repository.SetRepositoryImpl
 import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
 import pt.mf.mybinder.domain.usecase.CardUseCase
+import pt.mf.mybinder.domain.usecase.SearchUseCase
 import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
-import pt.mf.mybinder.utils.Preferences
-import pt.mf.mybinder.utils.Preferences.SETS_READY_KEY
-import pt.mf.mybinder.utils.Preferences.SUBTYPES_READY_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SEARCH_ORDER_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SUBTYPE_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SETS_READY_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SUBTYPES_READY_KEY
+import pt.mf.mybinder.utils.PreferencesManager.getPref
 import pt.mf.mybinder.utils.Result
 import pt.mf.mybinder.utils.Utils
 import pt.mf.mybinder.utils.Utils.empty
@@ -38,7 +42,9 @@ class CardSearchViewModel : ViewModel() {
         val selectedCardId: String = String.empty(),
         val subtypes: List<Subtype> = listOf(),
         val sets: List<Set> = listOf(),
-        val selectedOrderIndex: Int = 0,
+        val selectedSubtype: String = String.empty(),
+        val selectedSet: String = String.empty(),
+        val selectedOrder: Int = 0,
         val isNothingToDisplay: Boolean = true,
         val isNoResultsFound: Boolean = false
     )
@@ -49,6 +55,7 @@ class CardSearchViewModel : ViewModel() {
     private val cardUseCase = CardUseCase(CardRepositoryImpl())
     private val subtypeUseCase = SubtypeUseCase(SubtypeRepositoryImpl())
     private val setUseCase = SetUseCase(SetRepositoryImpl())
+    private val searchUseCase = SearchUseCase()
 
     init {
         fetchLocalSubtypes()
@@ -59,60 +66,63 @@ class CardSearchViewModel : ViewModel() {
         Logger.debug(TAG, "Searching for card with title \"$name\".")
 
         viewModelScope.launch(Dispatchers.IO) {
-            modifyLoadingVisibility(isLoading = true)
+            setLoadingVisibility(isLoading = true)
 
             when (val result = cardUseCase.searchCard(name)) {
                 is Result.Success -> {
                     Utils.tactileFeedback()
                     populateCardList(result.data.data)
-                    modifyLoadingVisibility(isLoading = false)
+                    setLoadingVisibility(isLoading = false)
                 }
 
                 is Result.Error -> {
                     Utils.tactileFeedback()
-                    modifyLoadingVisibility(isLoading = false)
+                    setLoadingVisibility(isLoading = false)
                 }
             }
         }
     }
 
     private fun fetchLocalSubtypes() {
-        modifyLoadingVisibility(isLoading = true)
+        setLoadingVisibility(isLoading = true)
 
         viewModelScope.launch {
             subtypeUseCase.fetchLocalSubtypes().collect {
                 _viewState.value = _viewState.value.copy(subtypes = it)
-                modifyLoadingVisibility(isLoading = false)
+                setLoadingVisibility(isLoading = false)
             }
         }
     }
 
     private fun fetchLocalSets() {
-        modifyLoadingVisibility(isLoading = true)
+        setLoadingVisibility(isLoading = true)
 
         viewModelScope.launch {
             setUseCase.fetchLocalSets().collect {
                 _viewState.value = _viewState.value.copy(sets = it)
-                modifyLoadingVisibility(isLoading = false)
+                setLoadingVisibility(isLoading = false)
             }
         }
     }
 
     fun isFilterReady(): Boolean {
-        return Preferences.getPref<Boolean>(SETS_READY_KEY) &&
-                Preferences.getPref<Boolean>(SUBTYPES_READY_KEY)
+        return getPref<Boolean>(SETS_READY_KEY) &&
+                getPref<Boolean>(SUBTYPES_READY_KEY)
     }
 
-    // TODO
     fun applyFilters() {
-        Logger.debug(TAG, "Applying filters.")
+        searchUseCase.applyFilters(
+            _viewState.value.selectedSubtype,
+            _viewState.value.selectedSet,
+            _viewState.value.selectedOrder
+        )
     }
 
-    private fun modifyLoadingVisibility(isLoading: Boolean) {
+    private fun setLoadingVisibility(isLoading: Boolean) {
         _viewState.value = _viewState.value.copy(isLoading = isLoading)
     }
 
-    fun modifyFilterWindowVisibility(isVisibile: Boolean) {
+    fun setFilterWindowVisibility(isVisibile: Boolean) {
         _viewState.value = _viewState.value.copy(isFilterWindowVisible = isVisibile)
     }
 
@@ -124,7 +134,7 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(cards = listOf())
     }
 
-    fun modifySelectedCardId(id: String) {
+    fun setSelectedCardId(id: String) {
         _viewState.value = _viewState.value.copy(selectedCardId = id)
     }
 
@@ -132,11 +142,53 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(selectedCardId = String.empty())
     }
 
-    fun modifySelectedOrderIndex(index: Int) {
-        _viewState.value = _viewState.value.copy(selectedOrderIndex = index)
+    fun changeIsNothingToDisplay(isNothingToDisplay: Boolean) {
+        _viewState.value = _viewState.value.copy(isNothingToDisplay = isNothingToDisplay)
     }
 
-    fun modifyisNothingToDisplay(isNothingToDisplay: Boolean) {
-        _viewState.value = _viewState.value.copy(isNothingToDisplay = isNothingToDisplay)
+    fun getSelectedSubtype(): String {
+        return _viewState.value.selectedSubtype
+    }
+
+    fun setSelectedSubtype(selectedSubtype: String) {
+        _viewState.value = _viewState.value.copy(selectedSubtype = selectedSubtype)
+    }
+
+    fun getSelectedSet(): String {
+        return _viewState.value.selectedSet
+    }
+
+    fun setSelectedSet(selectedSet: String) {
+        _viewState.value = _viewState.value.copy(selectedSet = selectedSet)
+    }
+
+    fun getSelectedOrder(): Int {
+        return _viewState.value.selectedOrder
+    }
+
+    fun setSelectedOrder(index: Int) {
+        _viewState.value = _viewState.value.copy(selectedOrder = index)
+    }
+
+    fun recallSelectedFilters() {
+        Logger.debug(TAG, "Recalling selected filters.")
+
+        val selectedSubtype = getPref<String>(SEARCH_SUBTYPE_KEY).ifEmpty {
+            _viewState.value.subtypes.first().name
+        }
+
+        val selectedSet = getPref<String>(SEARCH_SET_KEY).ifEmpty {
+            _viewState.value.sets.first().name
+        }
+
+        _viewState.value = _viewState.value.copy(
+            selectedSubtype = selectedSubtype,
+            selectedSet = selectedSet,
+            selectedOrder = getPref(SEARCH_ORDER_KEY)
+        )
+    }
+
+    fun formatPrice(price: Float?): String {
+        return if (price != null) "Low: $price€" else "Low: N/A"
     }
 }

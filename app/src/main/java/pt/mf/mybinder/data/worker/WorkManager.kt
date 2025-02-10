@@ -17,17 +17,17 @@ import java.util.concurrent.TimeUnit
 class WorkManager {
     companion object {
         const val TAG = "WorkManager"
-        const val DEFAULT_WORKER_FREQUENCY = 7
+        const val DEFAULT_WORKER_FREQ = 7L
     }
 
     fun scheduleWorkers() {
         Logger.debug(TAG, "Initilizing background workers.")
 
         val setPeriodicRequest =
-            generateWorkRequest<SetUpdateWorker>(15, TimeUnit.MINUTES)
+            generateWorkRequest<SetUpdateWorker>(DEFAULT_WORKER_FREQ, TimeUnit.DAYS)
 
         val subTypesPeriodicRequest =
-            generateWorkRequest<SubtypeUpdateWorker>(15, TimeUnit.MINUTES)
+            generateWorkRequest<SubtypeUpdateWorker>(DEFAULT_WORKER_FREQ, TimeUnit.DAYS)
 
         Logger.debug(TAG, "Enqueueing SetUpdateWorker.")
         enqueueWorkRequest(SetUpdateWorker.TAG, setPeriodicRequest)

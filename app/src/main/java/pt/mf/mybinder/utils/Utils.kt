@@ -46,10 +46,6 @@ object Utils {
         return ""
     }
 
-    fun formatPrice(price: Float?): String {
-        return if (price != null) "Low: $price€" else "Low: N/A"
-    }
-
     fun toast(message: String) {
         Toast.makeText(MyBinder.ctx, message, Toast.LENGTH_SHORT).show()
     }
