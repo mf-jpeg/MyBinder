@@ -13,8 +13,13 @@ object PreferencesManager {
 
     const val SETS_READY_KEY = "sets_ready"
     const val SUBTYPES_READY_KEY = "subtypes_ready"
+
     const val SEARCH_SUBTYPE_KEY = "search_subtype"
+    const val SEARCH_SUBTYPE_ACTIVE_KEY = "search_subtype_active"
+
     const val SEARCH_SET_KEY = "search_set"
+    const val SEARCH_SET_ACTIVE_KEY = "search_set_active"
+
     const val SEARCH_ORDER_KEY = "search_order"
 
     @SuppressLint("ApplySharedPref")

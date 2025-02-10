@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -72,8 +73,9 @@ import pt.mf.mybinder.presentation.search.CardSearchViewModel.CardSearchViewStat
 import pt.mf.mybinder.presentation.search.HOLDER.TAG
 import pt.mf.mybinder.presentation.theme.LoadingBackground
 import pt.mf.mybinder.presentation.theme.Theme
-import pt.mf.mybinder.utils.Dimensions.FilterWindowApplyTopPadding
-import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryRowTopPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowApplyCloseTopPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowCategorySeparatorHeight
+import pt.mf.mybinder.utils.Dimensions.FilterWindowCategorySeparatorVerticalPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowCategoryTitleEndPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowDropdownCornerRadius
 import pt.mf.mybinder.utils.Dimensions.FilterWindowElevation
@@ -81,6 +83,7 @@ import pt.mf.mybinder.utils.Dimensions.FilterWindowInnerPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowOutterPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowRadioTitleEndPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowRadioTitleStartPadding
+import pt.mf.mybinder.utils.Dimensions.FilterWindowSubCategoryRowTopPadding
 import pt.mf.mybinder.utils.Dimensions.FilterWindowTitleBottomPadding
 import pt.mf.mybinder.utils.Dimensions.ListFabPadding
 import pt.mf.mybinder.utils.Dimensions.ListHorizontalPadding
@@ -377,40 +380,77 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                 Text(
                     text = "${Utils.getString(R.string.card_search_filter_subtype)}:",
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
                         .padding(end = FilterWindowCategoryTitleEndPadding)
                         .weight(1f)
                 )
 
-                FilterDropdown(
-                    viewState.subtypes.map { it.name },
-                    viewModel::getSelectedSubtype,
-                    viewModel::setSelectedSubtype,
-                    Modifier.weight(4f)
-                )
+                Column(
+                    modifier = Modifier.weight(4f)
+                ) {
+                    FilterDropdown(
+                        viewState.subtypes.map { it.name },
+                        viewModel::getSelectedSubtype,
+                        viewModel::setSelectedSubtype,
+                    )
+
+                    Row(
+                        modifier = Modifier.padding(top = FilterWindowSubCategoryRowTopPadding)
+                    ) {
+                        FilterRadioGroup(
+                            listOf(
+                                Utils.getString(R.string.card_search_filter_all),
+                                Utils.getString(R.string.card_search_filter_specific)
+                            ),
+                            viewModel::isSubtypeFilterEnabled,
+                            viewModel::setSubtypeFilterEnabled,
+                            modifier = Modifier.weight(4f)
+                        )
+                    }
+                }
             }
 
-            Row(
-                modifier = Modifier.padding(top = FilterWindowCategoryRowTopPadding)
-            ) {
+            FilterCategorySeparator(
+                modifier = Modifier.padding(vertical = FilterWindowCategorySeparatorVerticalPadding)
+            )
+
+            Row {
                 Text(
                     text = "${Utils.getString(R.string.card_search_filter_set)}:",
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
                         .padding(end = FilterWindowCategoryTitleEndPadding)
                         .weight(1f)
                 )
-                FilterDropdown(
-                    viewState.sets.map { it.name },
-                    viewModel::getSelectedSet,
-                    viewModel::setSelectedSet,
-                    Modifier.weight(4f)
-                )
+
+                Column(
+                    modifier = Modifier.weight(4f)
+                ) {
+                    FilterDropdown(
+                        viewState.sets.map { it.name },
+                        viewModel::getSelectedSet,
+                        viewModel::setSelectedSet,
+                    )
+
+                    Row(
+                        modifier = Modifier.padding(top = FilterWindowSubCategoryRowTopPadding)
+                    ) {
+                        FilterRadioGroup(
+                            listOf(
+                                Utils.getString(R.string.card_search_filter_all),
+                                Utils.getString(R.string.card_search_filter_specific)
+                            ),
+                            viewModel::isSetFilterEnabled,
+                            viewModel::setSetFilterEnabled,
+                            modifier = Modifier.weight(4f)
+                        )
+                    }
+                }
             }
 
-            Row(
-                modifier = Modifier.padding(top = FilterWindowCategoryRowTopPadding)
-            ) {
+            FilterCategorySeparator(
+                modifier = Modifier.padding(vertical = FilterWindowCategorySeparatorVerticalPadding)
+            )
+
+            Row {
                 Text(
                     text = "${Utils.getString(R.string.card_search_filter_order)}:",
                     modifier = Modifier
@@ -419,7 +459,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
                         .weight(1f)
                 )
 
-                FilterOrderBy(
+                FilterRadioGroup(
                     listOf(
                         Utils.getString(R.string.card_search_filter_order_alpha),
                         Utils.getString(R.string.card_search_filter_order_chrono)
@@ -433,7 +473,7 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = FilterWindowApplyTopPadding)
+                    .padding(top = FilterWindowApplyCloseTopPadding)
             ) {
                 Text(
                     text = Utils.getString(R.string.general_close),
@@ -464,6 +504,16 @@ fun FilterWindow(viewState: CardSearchViewState, viewModel: CardSearchViewModel)
     }
 }
 
+@Composable
+fun FilterCategorySeparator(modifier: Modifier) {
+    Box(
+        modifier = modifier
+            .background(Theme.getPrimary())
+            .fillMaxWidth()
+            .height(FilterWindowCategorySeparatorHeight)
+    ) {}
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterDropdown(
@@ -476,7 +526,10 @@ fun FilterDropdown(
 
     ExposedDropdownMenuBox(
         expanded = isExpanded,
-        onExpandedChange = { isExpanded = it },
+        onExpandedChange = {
+            isExpanded = it
+            Utils.tactileFeedback()
+        },
         modifier = modifier
     ) {
         TextField(
@@ -501,6 +554,7 @@ fun FilterDropdown(
                     onClick = {
                         setSelectedOption.invoke(option)
                         isExpanded = false
+                        Utils.tactileFeedback()
                     }
                 )
             }
@@ -509,7 +563,7 @@ fun FilterDropdown(
 }
 
 @Composable
-fun FilterOrderBy(
+fun FilterRadioGroup(
     options: List<String>,
     getSelectedOption: () -> Int,
     setSelectedOption: (Int) -> Unit,

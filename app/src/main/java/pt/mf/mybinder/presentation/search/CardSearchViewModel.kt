@@ -18,7 +18,9 @@ import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_ORDER_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_ACTIVE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_KEY
+import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SUBTYPE_ACTIVE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SUBTYPE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SETS_READY_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SUBTYPES_READY_KEY
@@ -45,6 +47,8 @@ class CardSearchViewModel : ViewModel() {
         val selectedSubtype: String = String.empty(),
         val selectedSet: String = String.empty(),
         val selectedOrder: Int = 0,
+        val isSubtypeFilterEnabled: Int = 0,
+        val isSetFilterEnabled: Int = 0,
         val isNothingToDisplay: Boolean = true,
         val isNoResultsFound: Boolean = false
     )
@@ -114,7 +118,9 @@ class CardSearchViewModel : ViewModel() {
         searchUseCase.applyFilters(
             _viewState.value.selectedSubtype,
             _viewState.value.selectedSet,
-            _viewState.value.selectedOrder
+            _viewState.value.selectedOrder,
+            _viewState.value.isSubtypeFilterEnabled,
+            _viewState.value.isSetFilterEnabled
         )
     }
 
@@ -170,6 +176,22 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(selectedOrder = index)
     }
 
+    fun isSubtypeFilterEnabled(): Int {
+        return _viewState.value.isSubtypeFilterEnabled
+    }
+
+    fun setSubtypeFilterEnabled(isEnabled: Int) {
+        _viewState.value = _viewState.value.copy(isSubtypeFilterEnabled = isEnabled)
+    }
+
+    fun isSetFilterEnabled(): Int {
+        return _viewState.value.isSetFilterEnabled
+    }
+
+    fun setSetFilterEnabled(isEnabled: Int) {
+        _viewState.value = _viewState.value.copy(isSetFilterEnabled = isEnabled)
+    }
+
     fun recallSelectedFilters() {
         Logger.debug(TAG, "Recalling selected filters.")
 
@@ -184,7 +206,9 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(
             selectedSubtype = selectedSubtype,
             selectedSet = selectedSet,
-            selectedOrder = getPref(SEARCH_ORDER_KEY)
+            selectedOrder = getPref(SEARCH_ORDER_KEY),
+            isSubtypeFilterEnabled = getPref<Int>(SEARCH_SUBTYPE_ACTIVE_KEY),
+            isSetFilterEnabled = getPref<Int>(SEARCH_SET_ACTIVE_KEY),
         )
     }
 
