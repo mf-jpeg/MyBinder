@@ -12,7 +12,6 @@ import pt.mf.mybinder.data.repository.CardRepositoryImpl
 import pt.mf.mybinder.data.repository.SetRepositoryImpl
 import pt.mf.mybinder.data.repository.SubtypeRepositoryImpl
 import pt.mf.mybinder.domain.model.remote.Card
-import pt.mf.mybinder.domain.usecase.CardUseCase
 import pt.mf.mybinder.domain.usecase.SearchUseCase
 import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
@@ -56,10 +55,9 @@ class CardSearchViewModel : ViewModel() {
     private val _viewState = MutableStateFlow(CardSearchViewState())
     val viewState = _viewState.asStateFlow()
 
-    private val cardUseCase = CardUseCase(CardRepositoryImpl())
+    private val searchUseCase = SearchUseCase(CardRepositoryImpl())
     private val subtypeUseCase = SubtypeUseCase(SubtypeRepositoryImpl())
     private val setUseCase = SetUseCase(SetRepositoryImpl())
-    private val searchUseCase = SearchUseCase()
 
     init {
         fetchLocalSubtypes()
@@ -72,7 +70,7 @@ class CardSearchViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             setLoadingVisibility(isLoading = true)
 
-            when (val result = cardUseCase.searchCard(name)) {
+            when (val result = searchUseCase.searchCard(name)) {
                 is Result.Success -> {
                     Utils.tactileFeedback()
                     populateCardList(result.data.data)
