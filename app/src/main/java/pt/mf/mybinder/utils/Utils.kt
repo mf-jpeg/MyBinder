@@ -58,7 +58,11 @@ object Utils {
         Toast.makeText(MyBinder.ctx, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun convertIntToBoolean(value: Int): Boolean {
+    fun intToBool(value: Int): Boolean {
         return value == 1
+    }
+
+    fun addEnclosingQuotes(str: String): String {
+        return "\"$str\""
     }
 }

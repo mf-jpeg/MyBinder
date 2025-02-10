@@ -17,7 +17,8 @@ interface HttpApi {
     suspend fun fetchCards(
         @Query("q") query: String,
         @Query("pageSize") pageSize: Int,
-        @Query("page") pageNumber: Int
+        @Query("page") pageNumber: Int,
+        @Query("orderBy") orderBy: String
     ): Response<SearchResponse>
 
     @GET("cards/{id}")

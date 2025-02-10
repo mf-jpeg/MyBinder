@@ -76,11 +76,12 @@ class CardSearchViewModel : ViewModel() {
                 setUseCase.fetchLocalSetIdByName(getPref(SEARCH_SET_KEY)).firstOrNull()
 
             val result = searchUseCase.fetchCards(
-                name,
-                getPref(SEARCH_SUBTYPE_KEY),
-                setId.orEmpty(),
-                Utils.convertIntToBoolean(_viewState.value.isSubtypeFilterEnabled),
-                Utils.convertIntToBoolean(_viewState.value.isSetFilterEnabled)
+                name = name,
+                subtype = getPref(SEARCH_SUBTYPE_KEY),
+                setId = setId.orEmpty(),
+                isSubtypeFilterEnabled = Utils.intToBool(_viewState.value.isSubtypeFilterEnabled),
+                isSetFilterEnabled = Utils.intToBool(_viewState.value.isSetFilterEnabled),
+                selectedOrder = _viewState.value.selectedOrder
             )
 
             when (result) {

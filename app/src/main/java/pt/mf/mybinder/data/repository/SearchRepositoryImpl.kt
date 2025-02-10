@@ -13,9 +13,10 @@ class SearchRepositoryImpl : SearchRepository {
     override suspend fun fetchCards(
         query: String,
         pageSize: Int,
-        pageNumber: Int
+        pageNumber: Int,
+        orderBy: String,
     ): Response<SearchResponse> {
-        return HttpClient.api.fetchCards(query, pageSize, pageNumber)
+        return HttpClient.api.fetchCards(query, pageSize, pageNumber, orderBy)
     }
 
     override suspend fun fetchCard(

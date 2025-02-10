@@ -12,6 +12,7 @@ interface SearchRepository {
         query: String,
         pageSize: Int,
         pageNumber: Int,
+        orderBy: String,
     ): Response<SearchResponse>
 
     suspend fun fetchCard(

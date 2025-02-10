@@ -11,6 +11,7 @@ import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SUBTYPE_ACTIVE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SUBTYPE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.setPref
 import pt.mf.mybinder.utils.Result
+import pt.mf.mybinder.utils.Utils
 
 /**
  * Created by Martim Ferreira on 10/02/2025
@@ -33,12 +34,14 @@ class SearchUseCase(
         isSetFilterEnabled: Boolean,
         pageSize: Int = DEFAULT_PAGE_SIZE,
         pageNumber: Int = DEFAULT_PAGE_NUMBER,
+        selectedOrder: Int
     ): Result<SearchResponse> {
         return performHttpRequest {
             repository.fetchCards(
                 formatQuery(name, subtype, setId, isSubtypeFilterEnabled, isSetFilterEnabled),
                 pageSize,
-                pageNumber
+                pageNumber,
+                formatOrderBy(selectedOrder)
             )
         }
     }
@@ -59,11 +62,11 @@ class SearchUseCase(
         val sb = StringBuilder()
 
         if (name.isNotEmpty())
-            sb.append("name:$name ")
+            sb.append("name:${Utils.addEnclosingQuotes(name)} ")
 
         if (isSubtypeFilterEnabled) {
             if (subtype.isNotEmpty())
-                sb.append("subtypes:$subtype ")
+                sb.append("subtypes:${Utils.addEnclosingQuotes(subtype)} ")
         }
 
         if (isSetFilterEnabled) {
@@ -73,6 +76,15 @@ class SearchUseCase(
 
         Logger.debug(TAG, "Formatted query: \"${sb.trim()}\".")
         return sb.toString().trim()
+    }
+
+    // TODO: Refactor to be extensible.
+    private fun formatOrderBy(selectedOrder: Int): String {
+        return when (selectedOrder) {
+            0 -> "name"
+            1 -> "-set.releaseDate"
+            else -> "name"
+        }
     }
 
     fun applyFilters(
