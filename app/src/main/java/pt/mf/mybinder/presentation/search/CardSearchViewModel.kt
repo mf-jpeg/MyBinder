@@ -1,5 +1,7 @@
 package pt.mf.mybinder.presentation.search
 
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -7,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import pt.mf.mybinder.R
 import pt.mf.mybinder.data.model.local.Set
 import pt.mf.mybinder.data.model.local.Subtype
 import pt.mf.mybinder.data.repository.SearchRepositoryImpl
@@ -17,6 +20,7 @@ import pt.mf.mybinder.domain.usecase.SearchUseCase
 import pt.mf.mybinder.domain.usecase.SetUseCase
 import pt.mf.mybinder.domain.usecase.SubtypeUseCase
 import pt.mf.mybinder.utils.Logger
+import pt.mf.mybinder.utils.MyBinder
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_ORDER_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_ACTIVE_KEY
 import pt.mf.mybinder.utils.PreferencesManager.SEARCH_SET_KEY
@@ -52,8 +56,10 @@ class CardSearchViewModel : ViewModel() {
         val selectedOrder: Int = 0,
         val isSubtypeFilterEnabled: Int = 0,
         val isSetFilterEnabled: Int = 0,
+
         val isNothingToDisplay: Boolean = true,
         val isNoResultsFound: Boolean = false,
+        val isRequestError: Boolean = false
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -100,12 +106,13 @@ class CardSearchViewModel : ViewModel() {
                     } else
                         changeNoResultsFoundVisibility(isNoResultsFound = true)
 
+                    changeRequestErrorVisibility(isRequestError = false)
                     setLoadingVisibility(isLoading = false)
                 }
 
                 is Result.Error -> {
                     Utils.tactileFeedback()
-                    changeNoResultsFoundVisibility(isNoResultsFound = true)
+                    changeRequestErrorVisibility(isRequestError = true)
                     setLoadingVisibility(isLoading = false)
                 }
             }
@@ -214,6 +221,10 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(isNoResultsFound = isNoResultsFound)
     }
 
+    fun changeRequestErrorVisibility(isRequestError: Boolean) {
+        _viewState.value = _viewState.value.copy(isRequestError = isRequestError)
+    }
+
     fun getSelectedSubtype(): String {
         return _viewState.value.selectedSubtype
     }
@@ -275,6 +286,17 @@ class CardSearchViewModel : ViewModel() {
     }
 
     fun formatPrice(price: Float?): String {
-        return if (price != null) "Low: $price€" else "Low: N/A"
+        val lowest = Utils.getString(R.string.lowest)
+        return if (price != null) "$lowest: $price€" else "$lowest: N/A"
+    }
+
+    fun openWebView(url: String) {
+        Logger.debug(TAG, "Emitting WebView intent.")
+
+        Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }.also {
+            MyBinder.ctx.startActivity(it)
+        }
     }
 }

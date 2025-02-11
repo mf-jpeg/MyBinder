@@ -63,6 +63,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -109,7 +110,7 @@ object HOLDER {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardSearchScreen(padding: PaddingValues) {
+fun CardSearchScreen(padding: PaddingValues, navController: NavController) {
     val viewModel: CardSearchViewModel = viewModel()
 
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -128,6 +129,7 @@ fun CardSearchScreen(padding: PaddingValues) {
             Box {
                 NothingToDisplayYet(viewState)
                 NoResultsFound(viewState)
+                RequestError(viewState)
                 ResultList(listState, viewState, viewModel)
                 FilterWindow(viewState, viewModel)
             }
@@ -161,7 +163,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
 
                     if (!viewModel.isFilterReady()) {
                         viewModel.setFilterWindowVisibility(isVisibile = false)
-                        Utils.toast(Utils.getString(R.string.card_search_filter_filter_not_ready))
+                        Utils.toast(Utils.getString(R.string.card_search_filter_not_ready))
                         return@IconButton
                     }
 
@@ -218,7 +220,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
 fun ResultList(
     listState: LazyListState,
     viewState: CardSearchViewState,
-    viewModel: CardSearchViewModel
+    viewModel: CardSearchViewModel,
 ) {
     val reachedBottom: Boolean by remember {
         derivedStateOf { listState.reachedBottom() }
@@ -289,7 +291,15 @@ fun ListItem(card: Card, viewModel: CardSearchViewModel) {
                 Text(text = card.name)
                 Text(text = card.superType)
                 Text(text = card.set.name)
-                Text(text = viewModel.formatPrice(card.cardMarket?.prices?.lowPrice))
+                Text(
+                    text = viewModel.formatPrice(card.cardMarket?.prices?.lowPrice),
+                    color = Theme.getPrimary(),
+                    modifier = Modifier.clickable {
+                        Logger.debug(TAG, "Redirecting to CardMarket.")
+                        Utils.tactileFeedback()
+                        card.cardMarket?.url?.let { viewModel.openWebView(it) }
+                    }
+                )
             }
         }
     }
@@ -630,7 +640,7 @@ fun NothingToDisplayYet(viewState: CardSearchViewState) {
         return
 
     Text(
-        text = Utils.getString(R.string.card_search_filter_order_nothing_yet),
+        text = Utils.getString(R.string.card_search_order_nothing_yet),
         textAlign = TextAlign.Center,
         modifier = Modifier
             .fillMaxSize()
@@ -644,7 +654,21 @@ fun NoResultsFound(viewState: CardSearchViewState) {
         return
 
     Text(
-        text = Utils.getString(R.string.card_search_filter_order_nothing_no_results),
+        text = Utils.getString(R.string.card_search_order_nothing_no_results),
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize()
+    )
+}
+
+@Composable
+fun RequestError(viewState: CardSearchViewState) {
+    if (!viewState.isRequestError)
+        return
+
+    Text(
+        text = Utils.getString(R.string.card_search_request_error),
         textAlign = TextAlign.Center,
         modifier = Modifier
             .fillMaxSize()

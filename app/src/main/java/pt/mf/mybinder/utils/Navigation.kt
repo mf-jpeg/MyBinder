@@ -9,6 +9,10 @@ import pt.mf.mybinder.presentation.binder.BinderScreen
 import pt.mf.mybinder.presentation.deck.DeckSelectScreen
 import pt.mf.mybinder.presentation.search.CardSearchScreen
 import pt.mf.mybinder.presentation.settings.SettingsScreen
+import pt.mf.mybinder.utils.Screen.BinderScreen
+import pt.mf.mybinder.utils.Screen.CardSearchScreen
+import pt.mf.mybinder.utils.Screen.DeckSelectScreen
+import pt.mf.mybinder.utils.Screen.SettingsScreen
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -17,21 +21,21 @@ import pt.mf.mybinder.presentation.settings.SettingsScreen
 fun Navigation(padding: PaddingValues, navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.CardSearchScreen.route
+        startDestination = DeckSelectScreen
     ) {
-        composable(route = Screen.DeckSelectScreen.route) {
+        composable<DeckSelectScreen> {
             DeckSelectScreen(padding)
         }
 
-        composable(route = Screen.BinderScreen.route) {
+        composable<BinderScreen> {
             BinderScreen(padding)
         }
 
-        composable(route = Screen.CardSearchScreen.route) {
-            CardSearchScreen(padding)
+        composable<CardSearchScreen> {
+            CardSearchScreen(padding, navController)
         }
 
-        composable(route = Screen.SettingsScreen.route) {
+        composable<SettingsScreen> {
             SettingsScreen(padding)
         }
     }
