@@ -20,7 +20,7 @@ Craft your next tournament-worthy deck.
 
 Manage your personal card collection.
 
-#### Card Search (WIP)
+#### Card Search
 
 Look up a card by setting any combination of the following parameters:
 
