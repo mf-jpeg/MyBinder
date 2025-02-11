@@ -18,7 +18,8 @@ interface HttpApi {
         @Query("q") query: String,
         @Query("pageSize") pageSize: Int,
         @Query("page") pageNumber: Int,
-        @Query("orderBy") orderBy: String
+        @Query("orderBy") orderBy: String,
+        @Query("select") selectedFields: String
     ): Response<SearchResponse>
 
     @GET("cards/{id}")

@@ -10,10 +10,7 @@ data class Card(
     val name: String,
     @SerializedName("supertype") val superType: String,
     @SerializedName("subtypes") val subTypes: List<String>,
-    val hp: String,
-    val types: List<String>,
     val set: Set,
-    val number: String,
     val images: Images,
     @SerializedName("cardmarket") val cardMarket: CardMarket?
 ) {

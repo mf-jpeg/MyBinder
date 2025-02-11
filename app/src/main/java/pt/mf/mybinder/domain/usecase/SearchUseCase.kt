@@ -34,14 +34,15 @@ class SearchUseCase(
         isSetFilterEnabled: Boolean,
         pageSize: Int = DEFAULT_PAGE_SIZE,
         pageNumber: Int = DEFAULT_PAGE_NUMBER,
-        selectedOrder: Int
+        selectedOrder: Int,
     ): Result<SearchResponse> {
         return performHttpRequest {
             repository.fetchCards(
                 formatQuery(name, subtype, setId, isSubtypeFilterEnabled, isSetFilterEnabled),
                 pageSize,
                 pageNumber,
-                formatOrderBy(selectedOrder)
+                formatOrderBy(selectedOrder),
+                getSelectFields()
             )
         }
     }
@@ -76,6 +77,10 @@ class SearchUseCase(
 
         Logger.debug(TAG, "Formatted query: \"${sb.trim()}\".")
         return sb.toString().trim()
+    }
+
+    private fun getSelectFields(): String {
+        return "id,name,supertype,subtypes,set,images,cardmarket"
     }
 
     private fun formatOrderBy(selectedOrder: Int): String {
