@@ -42,6 +42,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -97,6 +98,7 @@ import pt.mf.mybinder.utils.Dimensions.ListTopPadding
 import pt.mf.mybinder.utils.Logger
 import pt.mf.mybinder.utils.Utils
 import pt.mf.mybinder.utils.Utils.empty
+import pt.mf.mybinder.utils.Utils.reachedBottom
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -197,6 +199,9 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                 focusManager.clearFocus()
                 viewModel.changeIsNothingToDisplayVisibility(false)
                 viewModel.changeNoResultsFoundVisibility(false)
+                viewModel.changeNameInLastPerformedQuery(query.trim())
+                viewModel.clearCardList()
+                viewModel.resetCurrentResultPage()
                 viewModel.fetchCards(query.trim())
             }
         ),
@@ -215,6 +220,17 @@ fun ResultList(
     viewState: CardSearchViewState,
     viewModel: CardSearchViewModel
 ) {
+    val reachedBottom: Boolean by remember {
+        derivedStateOf { listState.reachedBottom() }
+    }
+
+    LaunchedEffect(reachedBottom) {
+        if (!reachedBottom)
+            return@LaunchedEffect
+
+        viewModel.fetchNextPage()
+    }
+
     LazyColumn(
         state = listState,
         modifier = Modifier

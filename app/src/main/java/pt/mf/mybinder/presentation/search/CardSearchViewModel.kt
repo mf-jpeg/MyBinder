@@ -41,6 +41,9 @@ class CardSearchViewModel : ViewModel() {
         val isLoading: Boolean = false,
         val isFilterWindowVisible: Boolean = false,
         val cards: List<Card> = listOf(),
+        val nameInLastPerformedQuery: String = String.empty(),
+        val currentResultPage: Int = 1,
+        val cardTotalCount: Int = 0,
         val selectedCardId: String = String.empty(),
         val subtypes: List<Subtype> = listOf(),
         val sets: List<Set> = listOf(),
@@ -50,7 +53,7 @@ class CardSearchViewModel : ViewModel() {
         val isSubtypeFilterEnabled: Int = 0,
         val isSetFilterEnabled: Int = 0,
         val isNothingToDisplay: Boolean = true,
-        val isNoResultsFound: Boolean = false
+        val isNoResultsFound: Boolean = false,
     )
 
     private val _viewState = MutableStateFlow(CardSearchViewState())
@@ -81,6 +84,7 @@ class CardSearchViewModel : ViewModel() {
                 setId = setId.orEmpty(),
                 isSubtypeFilterEnabled = Utils.intToBool(_viewState.value.isSubtypeFilterEnabled),
                 isSetFilterEnabled = Utils.intToBool(_viewState.value.isSetFilterEnabled),
+                pageNumber = viewState.value.currentResultPage,
                 selectedOrder = _viewState.value.selectedOrder
             )
 
@@ -88,9 +92,12 @@ class CardSearchViewModel : ViewModel() {
                 is Result.Success -> {
                     Utils.tactileFeedback()
 
-                    if (result.data.data.isNotEmpty())
-                        populateCardList(result.data.data)
-                    else
+                    if (result.data.data.isNotEmpty()) {
+                        _viewState.value = _viewState.value.copy(
+                            cardTotalCount = result.data.totalCount
+                        )
+                        appendCardList(result.data.data)
+                    } else
                         changeNoResultsFoundVisibility(isNoResultsFound = true)
 
                     setLoadingVisibility(isLoading = false)
@@ -150,12 +157,45 @@ class CardSearchViewModel : ViewModel() {
         _viewState.value = _viewState.value.copy(isFilterWindowVisible = isVisibile)
     }
 
-    private fun populateCardList(cards: List<Card>) {
-        _viewState.value = _viewState.value.copy(cards = cards)
+    private fun appendCardList(cards: List<Card>) {
+        _viewState.value = _viewState.value.copy(
+            cards = mutableListOf<Card>().also {
+                it.addAll(_viewState.value.cards)
+                it.addAll(cards)
+            })
     }
 
     fun clearCardList() {
         _viewState.value = _viewState.value.copy(cards = listOf())
+    }
+
+    fun fetchNextPage() {
+        if (_viewState.value.cards.size == _viewState.value.cardTotalCount) {
+            Logger.debug(TAG, "All cards have already been fetched.")
+            return
+        }
+
+        Logger.debug(TAG, "Fetching next page.")
+        incrementCurrentResultPage()
+        fetchCards(viewState.value.nameInLastPerformedQuery)
+    }
+
+    private fun incrementCurrentResultPage() {
+        _viewState.value = _viewState.value.copy(
+            currentResultPage = _viewState.value.currentResultPage + 1
+        )
+    }
+
+    fun resetCurrentResultPage() {
+        _viewState.value = _viewState.value.copy(currentResultPage = 1)
+    }
+
+    private fun resetCardTotalCount() {
+        _viewState.value = _viewState.value.copy(cardTotalCount = 0)
+    }
+
+    fun changeNameInLastPerformedQuery(name: String) {
+        _viewState.value = _viewState.value.copy(nameInLastPerformedQuery = name)
     }
 
     fun setSelectedCardId(id: String) {

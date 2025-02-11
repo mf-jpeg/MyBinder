@@ -6,12 +6,14 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyListState
 
 /**
  * Created by Martim Ferreira on 07/02/2025
  */
 object Utils {
     private const val TAG = "Utils"
+    private const val DEFAULT_LIST_BUFFER = 3
 
     fun getString(id: Int): String {
         return MyBinder.ctx.getString(id)
@@ -64,5 +66,10 @@ object Utils {
 
     fun addEnclosingQuotes(str: String): String {
         return "\"$str\""
+    }
+
+    internal fun LazyListState.reachedBottom(buffer: Int = DEFAULT_LIST_BUFFER): Boolean {
+        val lastItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
+        return lastItem?.index != 0 && lastItem?.index == this.layoutInfo.totalItemsCount - buffer
     }
 }
