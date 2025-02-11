@@ -78,7 +78,6 @@ class SearchUseCase(
         return sb.toString().trim()
     }
 
-    // TODO: Refactor to be extensible.
     private fun formatOrderBy(selectedOrder: Int): String {
         return when (selectedOrder) {
             0 -> "name"
