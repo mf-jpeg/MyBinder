@@ -39,7 +39,6 @@ import pt.mf.mybinder.R
 import pt.mf.mybinder.presentation.theme.MyBinderTheme
 import pt.mf.mybinder.presentation.theme.Theme
 import pt.mf.mybinder.utils.Navigation
-import pt.mf.mybinder.utils.Screen
 import pt.mf.mybinder.utils.Utils
 
 /**
@@ -65,10 +64,10 @@ class ContainerActivity : ComponentActivity() {
 @Composable
 fun SetupLayout(navController: NavHostController, viewModel: ContainerViewModel) {
     val curBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = curBackStackEntry?.destination?.route ?: Screen.DeckSelectScreen.route
+    val curDist = curBackStackEntry?.destination?.route
 
     Scaffold(
-        topBar = { TopBar(getTitleForRoute(currentDestination)) },
+        topBar = { TopBar(viewModel.getScreenName(curDist)) },
         bottomBar = { BottomBar(navController, viewModel) },
         modifier = Modifier.fillMaxSize(),
         content = { Content(padding = it, navController) }
@@ -85,16 +84,6 @@ fun TopBar(title: String) {
         ),
         title = { Text(title) }
     )
-}
-
-fun getTitleForRoute(route: String): String {
-    return when (route) {
-        Screen.DeckSelectScreen.route -> Utils.getString(R.string.top_bar_deck)
-        Screen.BinderScreen.route -> Utils.getString(R.string.top_bar_binder)
-        Screen.CardSearchScreen.route -> Utils.getString(R.string.top_bar_search)
-        Screen.SettingsScreen.route -> Utils.getString(R.string.top_bar_settings)
-        else -> Utils.getString(R.string.general_app_name)
-    }
 }
 
 @Composable

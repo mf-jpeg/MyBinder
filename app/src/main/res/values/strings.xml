@@ -5,6 +5,8 @@
     <string name="general_app_name">My Binder</string>
     <string name="general_apply">Apply</string>
     <string name="general_close">Close</string>
+    <string name="screen">Screen</string>
+    <string name="lowest">Lowest</string>
 
     <!-- Top Bar -->
     <string name="top_bar_deck">Deck</string>
@@ -13,14 +15,17 @@
     <string name="top_bar_settings">Settings</string>
 
     <!-- Card Search -->
-    <string name="card_search_placeholder">Type card name</string>
+    <string name="card_search_placeholder">Type name (blank for all cards)</string>
     <string name="card_search_filter_title">Filters</string>
+    <string name="card_search_filter_all">All</string>
+    <string name="card_search_filter_specific">Specific</string>
     <string name="card_search_filter_subtype">Type</string>
     <string name="card_search_filter_set">Set</string>
     <string name="card_search_filter_order">Order</string>
     <string name="card_search_filter_order_alpha">Alpha</string>
-    <string name="card_search_filter_order_chrono">Chrono</string>
-    <string name="card_search_filter_filter_not_ready">Search filter will be available shortly.</string>
-    <string name="card_search_filter_order_nothing_yet">Nothing to display just yet.</string>
-    <string name="card_search_filter_order_nothing_no_results">No results found.</string>
+    <string name="card_search_filter_order_chrono">R. Chrono</string>
+    <string name="card_search_filter_not_ready">Search filter will be available shortly.</string>
+    <string name="card_search_order_nothing_yet">Nothing to display just yet.</string>
+    <string name="card_search_order_nothing_no_results">No results found.</string>
+    <string name="card_search_request_error">Something went wrong!</string>
 </resources>

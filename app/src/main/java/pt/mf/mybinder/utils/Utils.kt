@@ -6,12 +6,14 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
+import androidx.compose.foundation.lazy.LazyListState
 
 /**
  * Created by Martim Ferreira on 07/02/2025
  */
 object Utils {
     private const val TAG = "Utils"
+    private const val DEFAULT_LIST_BUFFER = 3
 
     fun getString(id: Int): String {
         return MyBinder.ctx.getString(id)
@@ -30,27 +32,44 @@ object Utils {
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val effect = VibrationEffect.createOneShot(50, 255)
-            vibrator.vibrate(effect)
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                vibrator.vibrate(effect)
+                Logger.debug(TAG, "Performed Q vibration.")
+            }
 
-            Logger.debug(TAG, "Performed modern vibration.")
-            return
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                val effect = VibrationEffect.createOneShot(40, 180)
+                vibrator.vibrate(effect)
+                Logger.debug(TAG, "Performed O vibration.")
+            }
+
+            else -> {
+                vibrator.vibrate(40)
+                Logger.debug(TAG, "Performed legacy vibration.")
+            }
         }
-
-        vibrator.vibrate(50)
-        Logger.debug(TAG, "Performed legacy vibration.")
     }
 
     fun String.Companion.empty(): String {
         return ""
     }
 
-    fun formatPrice(price: Float?): String {
-        return if (price != null) "Low: $price€" else "Low: N/A"
-    }
-
     fun toast(message: String) {
         Toast.makeText(MyBinder.ctx, message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun intToBool(value: Int): Boolean {
+        return value == 1
+    }
+
+    fun addEnclosingQuotes(str: String): String {
+        return "\"$str\""
+    }
+
+    internal fun LazyListState.reachedBottom(buffer: Int = DEFAULT_LIST_BUFFER): Boolean {
+        val lastItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
+        return lastItem?.index != 0 && lastItem?.index == this.layoutInfo.totalItemsCount - buffer
     }
 }

@@ -1,7 +1,7 @@
 package pt.mf.mybinder.data.remote
 
-import pt.mf.mybinder.data.model.remote.CardDetailsResponse
-import pt.mf.mybinder.data.model.remote.CardSearchResponse
+import pt.mf.mybinder.data.model.remote.CardResponse
+import pt.mf.mybinder.data.model.remote.SearchResponse
 import pt.mf.mybinder.data.model.remote.SetResponse
 import pt.mf.mybinder.data.model.remote.SubTypesResponse
 import retrofit2.Response
@@ -14,16 +14,18 @@ import retrofit2.http.Query
  */
 interface HttpApi {
     @GET("cards/")
-    suspend fun searchCard(
-        @Query("q") name: String,
+    suspend fun fetchCards(
+        @Query("q") query: String,
         @Query("pageSize") pageSize: Int,
-        @Query("page") pageNumber: Int
-    ): Response<CardSearchResponse>
+        @Query("page") pageNumber: Int,
+        @Query("orderBy") orderBy: String,
+        @Query("select") selectedFields: String
+    ): Response<SearchResponse>
 
     @GET("cards/{id}")
-    suspend fun fetchCardDetails(
+    suspend fun fetchCard(
         @Path("id") id: String
-    ): Response<CardDetailsResponse>
+    ): Response<CardResponse>
 
     @GET("sets")
     suspend fun fetchSets(): Response<SetResponse>

@@ -32,6 +32,10 @@ class SetUseCase(private val repository: SetRepository) : BaseUseCase() {
         return repository.fetchLocalSetById(id)
     }
 
+    suspend fun fetchLocalSetIdByName(name: String): Flow<String?> {
+        return repository.fetchLocalSetIdByName(name)
+    }
+
     fun convertRemoteToLocalSet(set: RemoteSet): LocalSet {
         return LocalSet(
             id = set.id,

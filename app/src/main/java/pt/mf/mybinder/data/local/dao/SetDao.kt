@@ -22,4 +22,7 @@ interface SetDao {
 
     @Query("SELECT * FROM `set` WHERE id=:id LIMIT 1")
     fun getById(id: String): Flow<Set?>
+
+    @Query("SELECT id FROM `set` WHERE name=:name LIMIT 1")
+    fun getIdByName(name: String): Flow<String?>
 }
