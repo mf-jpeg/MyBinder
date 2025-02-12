@@ -2,10 +2,30 @@
 
 ### Getting Started
 
-Clone the repository on your machine with the following command:
+#### APK
+
+To get started simply download the latest provided APK
+available [here](https://github.com/mf-jpeg/MyBinder/releases).
+
+```
+This APK is perfectly usable but does not provides an API key.
+This means requests are subject to rate limitation.
+```
+
+#### Cloning
+
+To avoid being rate limited you can clone the project and add a key.
+<br />You can get one for free by following [this](https://docs.pokemontcg.io) link.
 
 ```
 git clone https://github.com/mf-jpeg/MyBinder
+```
+
+And change the ```local.properties``` file.
+
+```
+sdk.dir=<path to sdk>
+API_KEY=<API key>
 ```
 
 ### Instructions
@@ -33,7 +53,7 @@ Look up a card by setting any combination of the following parameters:
 
 Customize how the app behaves on your device.
 
-### Libraries & Frameworks
+## Libraries & Frameworks
 
 * UI: Jetpack Compose, Material
 * Threading: Kotlin Coroutines
@@ -43,6 +63,6 @@ Customize how the app behaves on your device.
 * Database: Room
 * Background Work: WorkManager
 
-### License
+## License
 
 Licensed under the MIT license. See ```LICENSE``` for details.
