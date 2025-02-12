@@ -1,4 +1,4 @@
-## MyBinder - a digital trading card binder
+## MyBinder - a digital Pokémon trading card binder
 
 ### Getting Started
 
