@@ -7,6 +7,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
+import pt.mf.mybinder.BuildConfig
 
 /**
  * Created by Martim Ferreira on 07/02/2025
@@ -71,5 +72,25 @@ object Utils {
     internal fun LazyListState.reachedBottom(buffer: Int = DEFAULT_LIST_BUFFER): Boolean {
         val lastItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
         return lastItem?.index != 0 && lastItem?.index == this.layoutInfo.totalItemsCount - buffer
+    }
+
+    fun isBuildConfigFieldAvailable(name: String): Boolean {
+        return try {
+            BuildConfig::class.java.getDeclaredField(name)
+            true
+        } catch (ex: NoSuchFieldException) {
+            false
+        }
+    }
+
+    fun getBuildConfigField(name: String): String? {
+        return try {
+            val field = BuildConfig::class.java.getDeclaredField(name)
+            field.get(null) as String
+        } catch (e: NoSuchFieldException) {
+            null
+        } catch (e: IllegalAccessException) {
+            null
+        }
     }
 }
