@@ -201,6 +201,7 @@ fun SearchBar(viewState: CardSearchViewState, viewModel: CardSearchViewModel) {
                 focusManager.clearFocus()
                 viewModel.changeIsNothingToDisplayVisibility(false)
                 viewModel.changeNoResultsFoundVisibility(false)
+                viewModel.changeRequestErrorVisibility(false)
                 viewModel.changeNameInLastPerformedQuery(query.trim())
                 viewModel.clearCardList()
                 viewModel.resetCurrentResultPage()
